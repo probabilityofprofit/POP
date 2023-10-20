@@ -17,7 +17,7 @@ def blackScholesPut(s, k, rr, tt, sd):
 
     return p
 
-
+@jit(nopython=True, cache=True)
 def blackScholesCall(s, k, rr, tt, sd):
     if tt == 0 and (s / k > 1):
         c = s - k

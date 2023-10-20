@@ -179,6 +179,11 @@ def main():
             st.write(f"Sigma: {sigma:.2f}%")
             st.write(f"Days to Expiration: {days_to_expiration}")
             st.write(f"Rate: {rate:.2f}%")
+
+            # Add a "Start Over" button to reset the inputs
+        if st.button("Start Over"):
+            # Simulate a "Ctrl+F5" keypress to refresh the browser
+            pyautogui.hotkey("ctrl", "f5")
     
     except Exception as e:
         st.error(f"An error occurred: {e}")
@@ -198,10 +203,6 @@ def color_pop_cells(pop_value):
     else:
         # Handle non-numeric or NaN values gracefully by returning an empty string
         return ''
-
-    # Add a "Start Over" button to reset the inputs
-    if st.button("Start Over"):
-        pyautogui.hotkey("ctrl","F5")
 
 if __name__ == "__main__":
     main()

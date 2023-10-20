@@ -1,7 +1,6 @@
 from numba import jit
 from math import log, sqrt, exp, erf
 
-@jit(nopython=True, cache=True)
 def blackScholesPut(s, k, rr, tt, sd):
     if tt == 0 and (s / k > 1):
         p = 0
@@ -17,7 +16,6 @@ def blackScholesPut(s, k, rr, tt, sd):
 
     return p
 
-@jit(nopython=True, cache=True)
 def blackScholesCall(s, k, rr, tt, sd):
     if tt == 0 and (s / k > 1):
         c = s - k

@@ -5,7 +5,6 @@ import multiprocessing
 import poptions
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
-import pyautogui
 
 # Define the style to hide Streamlit elements
 hide_streamlit_style = """
@@ -180,11 +179,6 @@ def main():
             st.write(f"Sigma: {sigma:.2f}%")
             st.write(f"Days to Expiration: {days_to_expiration}")
             st.write(f"Rate: {rate:.2f}%")
-
-            # Add a "Start Over" button to reset the inputs
-        if st.button("Start Over"):
-            # Simulate a "Ctrl+F5" keypress to refresh the browser
-            pyautogui.hotkey("ctrl", "f5")
     
     except Exception as e:
         st.error(f"An error occurred: {e}")

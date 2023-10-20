@@ -1,7 +1,7 @@
 from numba import jit
 from math import log, sqrt, exp, erf
 
-
+@jit(nopython=True, cache=True)
 def blackScholesPut(s, k, rr, tt, sd):
     if tt == 0 and (s / k > 1):
         p = 0

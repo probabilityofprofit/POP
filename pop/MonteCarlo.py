@@ -11,7 +11,7 @@ from numba import jit
 # Assignment risks are not considered.
 # Earnings date and stock splits are not considered.
 
-
+@jit(nopython=True, cache=True)
 def monteCarlo(underlying, rate, sigma, days_to_expiration, closing_days_array, trials, initial_credit,
                    min_profit, strikes, bsm_func):
 

@@ -1,1 +1,5 @@
 numba
+matplotlib
+yfinance
+streamlit-option-menu
+pyautogui

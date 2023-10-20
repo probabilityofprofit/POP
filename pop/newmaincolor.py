@@ -199,5 +199,9 @@ def color_pop_cells(pop_value):
         # Handle non-numeric or NaN values gracefully by returning an empty string
         return ''
 
+    # Add a "Start Over" button to reset the inputs
+    if st.button("Start Over"):
+        pyautogui.hotkey("ctrl","F5")
+
 if __name__ == "__main__":
     main()

@@ -28,8 +28,8 @@ custom_css = """
 .block-container {
     padding-top: 1rem;
     padding-bottom: 1rem;
-    padding-left: 5rem;
-    padding-right: 5rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
 }
 
 /* Custom CSS for coloring cells based on POP values */

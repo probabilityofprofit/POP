@@ -83,7 +83,7 @@ def calculate_pop(percentage, closing_days, underlying, sigma, rate, trials, day
 # Define a custom colormap for POP values
 def custom_pop_colormap():
     # Define colors and their corresponding positions (from 0 to 1)
-    colors = [(0.0, 'red'), (0.5, 'yellow'), (1.0, 'green')]
+    colors = [(0.0, 'red'), (0.5, 'yellow'), (1.0, 'green')
     
     # Create the custom colormap
     return LinearSegmentedColormap.from_list('custom_pop_colormap', colors)
@@ -125,7 +125,7 @@ def main():
                 results = []
                 for percentage in percentage_array:
                     for closing_days in closing_days_array:
-                        results.append((int(percentage), int(closing_days)))
+                        results.append((int(percentage), int(closing_days))
 
                 pop_values = pool.starmap(calculate_pop, [(p, cd, underlying, sigma, rate, trials, days_to_expiration, short_strike, short_price, long_strike, long_price) for p, cd in results])
                 pool.close()
@@ -140,6 +140,12 @@ def main():
             # Display the calculated POP values in a table with cell background color
             st.write("Calculated POP Values:")
             st.dataframe(pop_results.style.applymap(color_pop_cells), height=800)
+
+            # Calculate the maximum profit for the put credit spread
+            max_profit = (short_price - long_price) * 100  # Assuming standard 100 shares per contract
+
+            # Display the maximum profit
+            st.write(f"Maximum Profit for Put Credit Spread: ${max_profit:.2f}")
 
             # Create X and Y values for the scatter plot
             x_values = []
@@ -165,7 +171,7 @@ def main():
             coefficients = np.polyfit(x_values, y_values_numeric, degree)
 
             # Generate the trendline values
-            trendline_x = np.array([min(x_values), max(x_values)])
+            trendline_x = np.array([min(x_values), max(x_values))
             trendline_y = np.polyval(coefficients, trendline_x)
 
             # Plot the trendline
@@ -179,7 +185,7 @@ def main():
             st.write(f"Sigma: {sigma:.2f}%")
             st.write(f"Days to Expiration: {days_to_expiration}")
             st.write(f"Rate: {rate:.2f}%")
-    
+
     except Exception as e:
         st.error(f"An error occurred: {e}")
 

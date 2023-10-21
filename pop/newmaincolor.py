@@ -94,10 +94,10 @@ def main():
         st.title("Put Credit Spread")
 
         # Manual input of values
-        underlying = st.number_input("Enter the underlying price:")
-        sigma = st.number_input("Enter the sigma (volatility) as a percentage:")
-        rate = st.number_input("Enter the interest rate as a percentage:")
-        days_to_expiration = st.number_input("Enter the days to expiration:")
+        underlying = st.number_input("Enter the underlying price:", value=None)
+        sigma = st.number_input("Enter the sigma (volatility) as a percentage:", value=None)
+        rate = st.number_input("Enter the interest rate as a percentage:", value=None)
+        days_to_expiration = st.number_input("Enter the days to expiration:", value=None)
         percentage_array = np.arange(1, 101)
         trials = 2000
 
@@ -105,10 +105,10 @@ def main():
         closing_days_array = np.arange(1, days_to_expiration + 1)
 
         # Define the missing variables for manual input
-        short_strike = st.number_input("Enter the short strike:")
-        short_price = st.number_input("Enter the short price:")
-        long_strike = st.number_input("Enter the long strike:")
-        long_price = st.number_input("Enter the long price:")
+        short_strike = st.number_input("Enter the short strike:", value=None)
+        short_price = st.number_input("Enter the short price:", value=None)
+        long_strike = st.number_input("Enter the long strike:", value=None)
+        long_price = st.number_input("Enter the long price:", value=None)
 
         # Create an empty DataFrame to store results
         pop_results = pd.DataFrame(index=percentage_array, columns=closing_days_array)

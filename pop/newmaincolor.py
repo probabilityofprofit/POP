@@ -117,6 +117,10 @@ def main():
         if st.button("Calculate"):
             # Use st.spinner to display a loading spinner while calculating
             with st.spinner("Calculating..."):
+                # Create a multiprocessing pool with the number of processes you want to use
+                num_processes = multiprocessing.cpu_count()  # Use all available CPU cores
+                pool = multiprocessing.Pool(processes=num_processes)
+
                 # Calculate POP values using multiprocessing
                 results = []
                 for percentage in percentage_array:
@@ -171,37 +175,17 @@ def main():
             plt.tight_layout()
             st.pyplot(plt)
 
-            # Calculate the coefficients for the trendline
-            degree = 1  # Linear regression
-            coefficients = np.polyfit(x_values, y_values_numeric, degree)
-
-            # Generate the trendline values
-            trendline_x = np.array([min(x_values), max(x_values)])
-            trendline_y = np.polyval(coefficients, trendline_x)
-
-            # Plot the trendline
-            plt.plot(trendline_x, trendline_y, color='#0031ff', linestyle='--', label='Trendline')
-
-            plt.legend()  # Show the legend with the trendline label
-            plt.tight_layout()
-            st.pyplot(plt)
+            # Calculate and display the maximum profit
+            max_profit = (short_price - long_price) * 100
+            st.write(f"Maximum Profit: ${max_profit:.2f}")
 
             # Display the calculated values
             st.write(f"Sigma: {sigma:.2f}%")
             st.write(f"Days to Expiration: {days_to_expiration}")
             st.write(f"Rate: {rate:.2f}%")
-
-            # Calculate the maximum profit
-            def calculate_maximum_profit(short_strike, short_price, long_strike, long_price):
-                net_credit_received = short_price * 100  # Multiply by 100 for standard option contract sizes
-                initial_spread_cost = (short_price - long_price) * 100  # Multiply by 100 for standard option contract sizes
-                return net_credit_received - initial_spread_cost
-
-            net_credit_received = short_price * 100  # Multiply by 100 for standard option contract sizes
-            initial_spread_cost = calculate_initial_spread_cost(short_strike, short_price, long_strike, long_price)
-            maximum_profit = net_credit_received - initial_spread_cost
-
-            st.write(f"Maximum Profit: ${maximum_profit:.2f}")
+    
+    except Exception as e:
+        st.error(f"An error occurred: {e}")
 
 # Define a function to apply cell background color based on POP values
 def color_pop_cells(pop_value):

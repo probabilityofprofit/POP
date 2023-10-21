@@ -43,11 +43,11 @@ custom_css = """
     color: white; /* Add white text color for visibility on red background */
 }
 
-.medium-pop {
+medium-pop {
     background-color: yellow;
 }
 
-.high-pop {
+high-pop {
     background-color: green;
     color: white; /* Add white text color for visibility on green background */
 }
@@ -83,7 +83,7 @@ def calculate_pop(percentage, closing_days, underlying, sigma, rate, trials, day
 # Define a custom colormap for POP values
 def custom_pop_colormap():
     # Define colors and their corresponding positions (from 0 to 1)
-    colors = [(0.0, 'red'), (0.5, 'yellow'), (1.0, 'green')
+    colors = [(0.0, 'red'), (0.5, 'yellow'), (1.0, 'green')]
     
     # Create the custom colormap
     return LinearSegmentedColormap.from_list('custom_pop_colormap', colors)
@@ -125,7 +125,7 @@ def main():
                 results = []
                 for percentage in percentage_array:
                     for closing_days in closing_days_array:
-                        results.append((int(percentage), int(closing_days))
+                        results.append((int(percentage), int(closing_days)))
 
                 pop_values = pool.starmap(calculate_pop, [(p, cd, underlying, sigma, rate, trials, days_to_expiration, short_strike, short_price, long_strike, long_price) for p, cd in results])
                 pool.close()

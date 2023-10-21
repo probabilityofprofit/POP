@@ -97,7 +97,7 @@ def main():
         underlying = st.number_input("Enter the underlying price:", value=0.00, placeholder="e.g. 347.47", min_value=0.00)
         sigma = st.number_input("Enter the sigma (volatility) as a percentage:", value=0.00, placeholder="e.g. 11.27", min_value=0.00)
         rate = st.number_input("Enter the interest rate as a percentage:", value=0.00, placeholder="e.g. 5.28", min_value=0.00)
-        days_to_expiration = st.number_input("Enter the days to expiration:", placeholder="e.g. 9", step=1)
+        days_to_expiration = st.number_input("Enter the days to expiration:", placeholder="e.g. 9", min_value=0 step=1)
         percentage_array = np.arange(1, 101)
         trials = 2000
 

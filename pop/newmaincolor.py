@@ -180,7 +180,7 @@ def main():
             st.pyplot(plt)
 
             # Calculate the entry cost for the put credit spread
-            entry_cost = (short_strike - long_strike) - (short_price - long_price)
+            entry_cost = ((short_strike - long_strike) - (short_price - long_price))*100
 
             # Calculate and display the maximum profit
             max_profit = (short_price - long_price) * 100

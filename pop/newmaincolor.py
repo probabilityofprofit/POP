@@ -90,19 +90,6 @@ def custom_pop_colormap():
     # Create the custom colormap
     return LinearSegmentedColormap.from_list('custom_pop_colormap', colors)
 
-# Function to calculate the probability to breakeven for the last expiration date
-def calculate_probability_to_breakeven(pop_results, percentage_to_cover_entry_cost):
-    # Find the last closing day (max of closing_days_array)
-    last_closing_day = max(closing_days_array)
-    
-    # Use percentage_to_cover_entry_cost to round and find the corresponding probability value
-    percentage_to_cover_entry_cost = round(percentage_to_cover_entry_cost)
-    
-    # Find the corresponding probability value from the calculated POP values
-    probability_to_breakeven = pop_results.at[percentage_to_cover_entry_cost, last_closing_day]
-    
-    return probability_to_breakeven
-
 # Streamlit UI
 def main():
     try:
@@ -221,10 +208,6 @@ def main():
             st.write(f"Underlying Breakeven at Expiry: ${underlying_breakeven:.2f}")
             st.write(f"Arithmetic-Mean POP: {mean_pop:.2f}%")
             st.write(f"Geometric-Mean POP: {geometric_mean_pop * 100:.2f}%")
-
-            # Calculate and display the probability to breakeven for the last expiration date
-            probability_to_breakeven = calculate_probability_to_breakeven(pop_results, percentage_to_cover_entry_cost)
-            st.write(f"Probability to Breakeven (Last Expiration Date): {probability_to_breakeven:.2f}%")
 
     except Exception as e:
         st.error(f"An error occurred: {e}")

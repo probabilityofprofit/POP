@@ -190,7 +190,7 @@ def main():
             st.write(f"Sigma: {sigma:.2f}%")
             st.write(f"Days to Expiration: {days_to_expiration}")
             st.write(f"Rate: {rate:.2f}%")
-            st.write(f"Mean POP: {mean_pop:.2f}%")
+            st.write(f"Arithmetic-Mean POP: {mean_pop:.2f}%")
     
     except Exception as e:
         st.error(f"An error occurred: {e}")

@@ -169,7 +169,7 @@ def main():
             coefficients = np.polyfit(x_values, y_values_numeric, degree)
 
             # Generate the trendline values
-            trendline_x = np.array([min(x_values), max(x_values))
+            trendline_x = np.array([min(x_values), max(x_values)])
             trendline_y = np.polyval(coefficients, trendline_x)
 
             # Plot the trendline

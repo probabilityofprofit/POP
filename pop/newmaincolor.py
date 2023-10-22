@@ -74,7 +74,7 @@ st.markdown(combined_styles, unsafe_allow_html=True)
 
 # Function to calculate POP for a specific combination of percentage and closing days
 def calculate_pop(percentage, closing_days, underlying, sigma, rate, trials, days_to_expiration, short_strike, short_price, long_strike, long_price):
-    # Calculate POP and convert the result to a float
+    # Calculate POP and convert the result to a float with two decimal places
     pop_value = float(poptions.putCreditSpread(
         underlying, sigma, rate, trials, days_to_expiration,
         [closing_days], [percentage], short_strike,
@@ -142,7 +142,8 @@ def main():
 
             # Display the calculated POP values in a table with cell background color
             st.write("Calculated POP Values:")
-            st.dataframe(pop_results.style.applymap(color_pop_cells), height=800)
+            formatted_pop_results = pop_results.applymap(lambda x: f'{x:.2f}')
+            st.dataframe(formatted_pop_results.style.applymap(color_pop_cells), height=800)
 
             # Create X and Y values for the scatter plot
             x_values = []

@@ -205,9 +205,9 @@ def main():
             st.write(f"Maximum Return: ${max_profit:.2f}")
             st.write(f"Maximum Return on Risk: {max_return_on_risk * 100:.2f}%")
             st.write(f"Percentage to Cover Entry Cost: {percentage_to_cover_entry_cost:.2f}%")
+            st.write(f"Underlying Breakeven at Expiry: ${underlying_breakeven:.2f}")
             st.write(f"Arithmetic-Mean POP: {mean_pop:.2f}%")
             st.write(f"Geometric-Mean POP: {geometric_mean_pop * 100:.2f}%")
-            st.write(f"Underlying Breakeven at Expiry: ${underlying_breakeven:.2f}")
 
     except Exception as e:
         st.error(f"An error occurred: {e}")

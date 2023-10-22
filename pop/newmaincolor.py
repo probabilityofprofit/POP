@@ -177,6 +177,7 @@ def main():
 
             plt.legend()  # Show the legend with the trendline label
             plt.tight_layout()
+            st.pyplot(plt)
 
             # Calculate the entry cost for the put credit spread
             entry_cost = ((short_strike - long_strike) - (short_price - long_price))*100
@@ -190,30 +191,27 @@ def main():
             # Calculate the percentage on the maximum return to make entry cost back
             percentage_to_cover_entry_cost = (entry_cost / max_profit) * 100
 
+            # Calculate the mean of POP values
+            mean_pop = pop_results.stack().mean()
+
+            # Calculate the geometric mean of POP values
+            geometric_mean_pop = pop_results.stack().apply(lambda x: 1 + (x / 100)).prod() ** (1 / len(pop_results.stack())) - 1
+
             # Calculate breakevens at expiry for put credit spreads
             underlying_breakeven = short_strike - (short_price - long_price)
-
-            # Calculate breakeven probability
-            def calculate_breakeven_probability(percentage_to_cover_entry_cost, pop_results):
-                rounded_percentage = round(percentage_to_cover_entry_cost)
-                if rounded_percentage < 1:
-                    rounded_percentage = 1
-                elif rounded_percentage > 100:
-                    rounded_percentage = 100
-                pop_breakeven = pop_results.at[rounded_percentage]
-                return pop_breakeven
-
-            breakeven_probability = calculate_breakeven_probability(percentage_to_cover_entry_cost, pop_results)
 
             # Display the calculated values
             st.write(f"Entry Cost: ${entry_cost:.2f}")
             st.write(f"Maximum Return: ${max_profit:.2f}")
             st.write(f"Maximum Return on Risk: {max_return_on_risk * 100:.2f}%")
             st.write(f"Percentage to Cover Entry Cost: {percentage_to_cover_entry_cost:.2f}%")
-            st.write(f"Breakeven Probability: {breakeven_probability:.2f}%")
             st.write(f"Underlying Breakeven at Expiry: ${underlying_breakeven:.2f}")
             st.write(f"Arithmetic-Mean POP: {mean_pop:.2f}%")
             st.write(f"Geometric-Mean POP: {geometric_mean_pop * 100:.2f}%")
+
+            # Calculate and display the probability to breakeven for the last expiration date
+            probability_to_breakeven = calculate_probability_to_breakeven(pop_results, percentage_to_cover_entry_cost)
+            st.write(f"Probability to Breakeven (Last Expiration Date): {probability_to_breakeven:.2f}%")
 
     except Exception as e:
         st.error(f"An error occurred: {e}")

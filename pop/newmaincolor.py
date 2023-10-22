@@ -43,7 +43,7 @@ custom_css = """
     color: white; /* Add white text color for visibility on red background */
 }
 
-.medium-pop {
+medium-pop {
     background-color: yellow;
 }
 
@@ -74,11 +74,14 @@ st.markdown(combined_styles, unsafe_allow_html=True)
 
 # Function to calculate POP for a specific combination of percentage and closing days
 def calculate_pop(percentage, closing_days, underlying, sigma, rate, trials, days_to_expiration, short_strike, short_price, long_strike, long_price):
-    return poptions.putCreditSpread(
-        underlying, sigma, rate, trials, days_to_expiration,
-        [closing_days], [percentage], short_strike,
-        short_price, long_strike, long_price
-    )
+    try:
+        return poptions.putCreditSpread(
+            underlying, sigma, rate, trials, days_to_expiration,
+            [closing_days], [percentage], short_strike,
+            short_price, long_strike, long_price
+        )
+    except Exception as e:
+        return np.nan  # Return NaN for non-numeric or error values
 
 # Define a custom colormap for POP values
 def custom_pop_colormap():
@@ -189,7 +192,7 @@ def main():
             # Calculate and display the maximum profit
             max_profit = (short_price - long_price) * 100
             st.write(f"Maximum Profit: ${max_profit:.2f}")
-    
+
     except Exception as e:
         st.error(f"An error occurred: {e}")
 

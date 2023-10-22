@@ -197,6 +197,10 @@ def main():
             # Calculate the geometric mean of POP values
             geometric_mean_pop = pop_results.stack().apply(lambda x: 1 + (x / 100)).prod() ** (1 / len(pop_results.stack())) - 1
 
+            # Calculate breakevens at expiry for put credit spreads
+            breakeven_lower = short_strike - (short_price - long_price)
+            breakeven_upper = short_strike
+
             # Display the calculated values
             st.write(f"Entry Cost: ${entry_cost:.2f}")
             st.write(f"Maximum Return: ${max_profit:.2f}")
@@ -204,6 +208,8 @@ def main():
             st.write(f"Percentage to Cover Entry Cost: {percentage_to_cover_entry_cost:.2f}%")
             st.write(f"Arithmetic-Mean POP: {mean_pop:.2f}%")
             st.write(f"Geometric-Mean POP: {geometric_mean_pop * 100:.2f}%")
+            st.write(f"Breakeven at Expiry (Lower): ${breakeven_lower:.2f}")
+            st.write(f"Breakeven at Expiry (Upper): ${breakeven_upper:.2f}")
 
     except Exception as e:
         st.error(f"An error occurred: {e}")

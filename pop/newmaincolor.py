@@ -127,7 +127,7 @@ def main():
                 results = []
                 for percentage in percentage_array:
                     for closing_days in closing_days_array:
-                        results.append((int(percentage), int(closing_days)))
+                        results.append((int(percentage), int(closing_days))
 
                 # Ensure that the pop_values list contains numeric values
                 pop_values = pool.starmap(calculate_pop, [(p, cd, underlying, sigma, rate, trials, days_to_expiration, short_strike, short_price, long_strike, long_price) for p, cd in results])
@@ -183,16 +183,18 @@ def main():
             max_profit = (short_price - long_price) * 100
             st.write(f"Maximum Profit: ${max_profit:.2f}")
 
-            # Filter out 0 values and calculate the geometric mean of POP values
-            filtered_pop_values = pop_results.stack()[pop_results.stack() > 0]
-            geometric_mean_pop = filtered_pop_values.prod() ** (1 / len(filtered_pop_values))
+            # Calculate the mean of POP values
+            mean_pop = pop_results.stack().mean()
+            
+            # Calculate the geometric mean of POP values
+            geometric_mean_pop = pop_results.stack().apply(lambda x: 1 + (x / 100)).prod() ** (1 / len(pop_results.stack())) - 1
 
             # Display the calculated values
             st.write(f"Sigma: {sigma:.2f}%")
             st.write(f"Days to Expiration: {days_to_expiration}")
             st.write(f"Rate: {rate:.2f}%")
             st.write(f"Arithmetic-Mean POP: {mean_pop:.2f}%")
-            st.write(f"Geometric-Mean POP (excluding 0 values): {geometric_mean_pop:.2f}%")
+            st.write(f"Geometric-Mean POP: {geometric_mean_pop * 100:.2f}%")
     
     except Exception as e:
         st.error(f"An error occurred: {e}")

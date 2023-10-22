@@ -137,10 +137,6 @@ def main():
                     closing_days_int = int(closing_days)
                     pop_results.at[percentage_int, closing_days_int] = pop_value
 
-            # Display the calculated POP values in a table with cell background color
-            st.write("Calculated POP Values:")
-            st.dataframe(pop_results.style.applymap(color_pop_cells), height=800)
-
             # Create X and Y values for the scatter plot
             x_values = []
             y_values = []
@@ -150,6 +146,21 @@ def main():
 
             # Convert y_values to numeric values
             y_values_numeric = pd.to_numeric(y_values, errors='coerce')
+
+            # Calculate the mean of POP values
+            mean_pop = pop_results.stack().mean()
+
+            # Display the calculated values
+            st.write(f"Sigma: {sigma:.2f}%")
+            st.write(f"Days to Expiration: {days_to_expiration}")
+            st.write(f"Rate: {rate:.2f}%")
+
+            # Display the mean Probability of Profit (POP)
+            st.write(f"Mean Probability of Profit (POP): {mean_pop:.2f}")
+
+            # Display the calculated POP values in a table with cell background color
+            st.write("Calculated POP Values:")
+            st.dataframe(pop_results.style.applymap(color_pop_cells), height=800)
 
             # Create a scatter plot using Matplotlib with the custom colormap
             plt.figure(figsize=(10, 6))  # Adjust the figure size as needed
@@ -178,11 +189,6 @@ def main():
             # Calculate and display the maximum profit
             max_profit = (short_price - long_price) * 100
             st.write(f"Maximum Profit: ${max_profit:.2f}")
-
-            # Display the calculated values
-            st.write(f"Sigma: {sigma:.2f}%")
-            st.write(f"Days to Expiration: {days_to_expiration}")
-            st.write(f"Rate: {rate:.2f}%")
     
     except Exception as e:
         st.error(f"An error occurred: {e}")

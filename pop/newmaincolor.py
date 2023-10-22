@@ -127,7 +127,7 @@ def main():
                 results = []
                 for percentage in percentage_array:
                     for closing_days in closing_days_array:
-                        results.append((int(percentage), int(closing_days))
+                        results.append((int(percentage), int(closing_days)))
 
                 # Ensure that the pop_values list contains numeric values
                 pop_values = pool.starmap(calculate_pop, [(p, cd, underlying, sigma, rate, trials, days_to_expiration, short_strike, short_price, long_strike, long_price) for p, cd in results])

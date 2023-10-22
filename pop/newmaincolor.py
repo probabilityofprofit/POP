@@ -74,11 +74,13 @@ st.markdown(combined_styles, unsafe_allow_html=True)
 
 # Function to calculate POP for a specific combination of percentage and closing days
 def calculate_pop(percentage, closing_days, underlying, sigma, rate, trials, days_to_expiration, short_strike, short_price, long_strike, long_price):
-    return poptions.putCreditSpread(
+    # Calculate POP and convert the result to a float
+    pop_value = float(poptions.putCreditSpread(
         underlying, sigma, rate, trials, days_to_expiration,
         [closing_days], [percentage], short_strike,
         short_price, long_strike, long_price
-    )
+    ))
+    return pop_value
 
 # Define a custom colormap for POP values
 def custom_pop_colormap():
@@ -127,6 +129,7 @@ def main():
                     for closing_days in closing_days_array:
                         results.append((int(percentage), int(closing_days)))
 
+                # Ensure that the pop_values list contains numeric values
                 pop_values = pool.starmap(calculate_pop, [(p, cd, underlying, sigma, rate, trials, days_to_expiration, short_strike, short_price, long_strike, long_price) for p, cd in results])
                 pool.close()
                 pool.join()

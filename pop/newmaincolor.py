@@ -90,6 +90,18 @@ def custom_pop_colormap():
     # Create the custom colormap
     return LinearSegmentedColormap.from_list('custom_pop_colormap', colors)
 
+# Function to calculate the probability to breakeven (POPBE)
+def calculate_popbe(percentage_to_cover_entry_cost, percentage_array, pop_results):
+    # Round the percentage to cover entry cost to the nearest integer
+    rounded_percentage = round(percentage_to_cover_entry_cost)
+
+    # Get the last day of days_to_expiration
+    last_day = max(pop_results.columns)
+
+    # Find the corresponding POP value for the rounded percentage on the last day
+    popbe = pop_results.at[rounded_percentage, last_day]
+    return popbe
+
 # Streamlit UI
 def main():
     try:
@@ -200,6 +212,9 @@ def main():
             # Calculate breakevens at expiry for put credit spreads
             underlying_breakeven = short_strike - (short_price - long_price)
 
+            # Calculate the probability to breakeven (POPBE)
+            popbe = calculate_popbe(percentage_to_cover_entry_cost, percentage_array, pop_results)
+
             # Display the calculated values
             st.write(f"Entry Cost: ${entry_cost:.2f}")
             st.write(f"Maximum Return: ${max_profit:.2f}")
@@ -208,6 +223,7 @@ def main():
             st.write(f"Underlying Breakeven at Expiry: ${underlying_breakeven:.2f}")
             st.write(f"Arithmetic-Mean POP: {mean_pop:.2f}%")
             st.write(f"Geometric-Mean POP: {geometric_mean_pop * 100:.2f}%")
+            st.write(f"Probability to Breakeven at Expiry: {popbe:.2f}%")
 
     except Exception as e:
         st.error(f"An error occurred: {e}")

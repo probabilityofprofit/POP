@@ -86,7 +86,6 @@ def calculate_pop(percentage, closing_days, underlying, sigma, rate, trials, day
 def custom_pop_colormap():
     # Define colors and their corresponding positions (from 0 to 1)
     colors = [(0.0, 'red'), (0.5, 'yellow'), (1.0, 'green')]
-    ]
     
     # Create the custom colormap
     return LinearSegmentedColormap.from_list('custom_pop_colormap', colors)

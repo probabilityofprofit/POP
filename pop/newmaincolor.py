@@ -186,8 +186,11 @@ def main():
             # Calculate the mean of POP values
             mean_pop = pop_results.stack().mean()
 
-            # Calculate the geometric mean of POP values
-            geometric_mean_pop = pop_results.stack().prod() ** (1 / pop_results.size)
+            # Filter out zero or negative POP values for the geometric mean calculation
+            filtered_pop_values = [pop for pop in pop_values if pop > 0]
+
+            # Calculate the geometric mean of filtered POP values
+            geometric_mean_pop = np.prod(filtered_pop_values) ** (1 / len(filtered_pop_values))
 
             # Display the calculated values
             st.write(f"Sigma: {sigma:.2f}%")

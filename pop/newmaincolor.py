@@ -181,7 +181,6 @@ def main():
 
             # Calculate and display the maximum profit
             max_profit = (short_price - long_price) * 100
-            st.write(f"Maximum Profit: ${max_profit:.2f}")
 
             # Calculate the mean of POP values
             mean_pop = pop_results.stack().mean()
@@ -190,9 +189,7 @@ def main():
             geometric_mean_pop = pop_results.stack().apply(lambda x: 1 + (x / 100)).prod() ** (1 / len(pop_results.stack())) - 1
 
             # Display the calculated values
-            st.write(f"Sigma: {sigma:.2f}%")
-            st.write(f"Days to Expiration: {days_to_expiration}")
-            st.write(f"Rate: {rate:.2f}%")
+            st.write(f"Maximum Profit: ${max_profit:.2f}")
             st.write(f"Arithmetic-Mean POP: {mean_pop:.2f}%")
             st.write(f"Geometric-Mean POP: {geometric_mean_pop * 100:.2f}%")
     

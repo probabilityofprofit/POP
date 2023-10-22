@@ -199,7 +199,7 @@ def main():
             st.write(f"Maximum Return: ${max_profit:.2f}")
             st.write(f"Arithmetic-Mean POP: {mean_pop:.2f}%")
             st.write(f"Geometric-Mean POP: {geometric_mean_pop * 100:.2f}%")
-            st.write(f"Maximum Return on Risk: {max_return_on_risk:.2f}")
+            st.write(f"Maximum Return on Risk: {max_return_on_risk * 100:.2f}%")
 
     except Exception as e:
         st.error(f"An error occurred: {e}")

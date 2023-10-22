@@ -193,7 +193,7 @@ def main():
 
             # Display the calculated values
             st.write(f"Entry Cost: ${entry_cost:.2f}")
-            st.write(f"Maximum Profit: ${max_profit:.2f}")
+            st.write(f"Maximum Return: ${max_profit:.2f}")
             st.write(f"Arithmetic-Mean POP: {mean_pop:.2f}%")
             st.write(f"Geometric-Mean POP: {geometric_mean_pop * 100:.2f}%")
     

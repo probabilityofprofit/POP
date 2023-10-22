@@ -43,11 +43,11 @@ custom_css = """
     color: white; /* Add white text color for visibility on red background */
 }
 
-.medium-pop {
+medium-pop {
     background-color: yellow;
 }
 
-.high-pop {
+high-pop {
     background-color: green;
     color: white; /* Add white text color for visibility on green background */
 }
@@ -115,6 +115,9 @@ def main():
         # Create an empty DataFrame to store results
         pop_results = pd.DataFrame(index=percentage_array, columns=closing_days_array)
 
+        # Set a threshold for filtering out extremely high values
+        pop_threshold = 1e6  # Adjust this threshold based on your data
+
         # Add a "Calculate" button to trigger the calculation
         if st.button("Calculate"):
             # Use st.spinner to display a loading spinner while calculating
@@ -139,6 +142,9 @@ def main():
                     percentage_int = int(percentage)
                     closing_days_int = int(closing_days)
                     pop_results.at[percentage_int, closing_days_int] = pop_value
+
+                # Filter out zero, negative, and extremely high POP values for the geometric mean calculation
+                filtered_pop_values = [pop for pop in pop_values if 0 < pop <= pop_threshold]
 
             # Display the calculated POP values in a table with cell background color
             st.write("Calculated POP Values:")
@@ -185,9 +191,6 @@ def main():
 
             # Calculate the mean of POP values
             mean_pop = pop_results.stack().mean()
-
-            # Filter out zero or negative POP values for the geometric mean calculation
-            filtered_pop_values = [pop for pop in pop_values if pop > 0]
 
             # Calculate the geometric mean of filtered POP values
             geometric_mean_pop = np.prod(filtered_pop_values) ** (1 / len(filtered_pop_values))

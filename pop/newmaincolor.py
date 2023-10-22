@@ -74,13 +74,11 @@ st.markdown(combined_styles, unsafe_allow_html=True)
 
 # Function to calculate POP for a specific combination of percentage and closing days
 def calculate_pop(percentage, closing_days, underlying, sigma, rate, trials, days_to_expiration, short_strike, short_price, long_strike, long_price):
-    # Calculate POP and convert the result to a float with two decimal places
-    pop_value = float(poptions.putCreditSpread(
+    return poptions.putCreditSpread(
         underlying, sigma, rate, trials, days_to_expiration,
         [closing_days], [percentage], short_strike,
         short_price, long_strike, long_price
-    ))
-    return pop_value
+    )
 
 # Define a custom colormap for POP values
 def custom_pop_colormap():
@@ -129,7 +127,6 @@ def main():
                     for closing_days in closing_days_array:
                         results.append((int(percentage), int(closing_days)))
 
-                # Ensure that the pop_values list contains numeric values
                 pop_values = pool.starmap(calculate_pop, [(p, cd, underlying, sigma, rate, trials, days_to_expiration, short_strike, short_price, long_strike, long_price) for p, cd in results])
                 pool.close()
                 pool.join()
@@ -142,8 +139,7 @@ def main():
 
             # Display the calculated POP values in a table with cell background color
             st.write("Calculated POP Values:")
-            formatted_pop_results = pop_results.applymap(lambda x: f'{x:.2f}')
-            st.dataframe(formatted_pop_results.style.applymap(color_pop_cells), height=800)
+            st.dataframe(pop_results.style.applymap(color_pop_cells), height=800)
 
             # Create X and Y values for the scatter plot
             x_values = []
@@ -183,14 +179,10 @@ def main():
             max_profit = (short_price - long_price) * 100
             st.write(f"Maximum Profit: ${max_profit:.2f}")
 
-            # Calculate the mean of POP values
-            mean_pop = pop_results.stack().mean()
-
             # Display the calculated values
             st.write(f"Sigma: {sigma:.2f}%")
             st.write(f"Days to Expiration: {days_to_expiration}")
             st.write(f"Rate: {rate:.2f}%")
-            st.write(f"Mean POP: {mean_pop:.2f}%")
     
     except Exception as e:
         st.error(f"An error occurred: {e}")

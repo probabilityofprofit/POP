@@ -86,6 +86,7 @@ def calculate_pop(percentage, closing_days, underlying, sigma, rate, trials, day
 def custom_pop_colormap():
     # Define colors and their corresponding positions (from 0 to 1)
     colors = [(0.0, 'red'), (0.5, 'yellow'), (1.0, 'green')]
+    ]
     
     # Create the custom colormap
     return LinearSegmentedColormap.from_list('custom_pop_colormap', colors)
@@ -188,6 +189,9 @@ def main():
             # Calculate the maximum return on risk for put credit spreads
             max_return_on_risk = max_profit / entry_cost
 
+            # Calculate the percentage on the maximum return to make entry cost back
+            percentage_to_cover_entry_cost = (max_profit / entry_cost) * 100
+
             # Calculate the mean of POP values
             mean_pop = pop_results.stack().mean()
 
@@ -198,6 +202,7 @@ def main():
             st.write(f"Entry Cost: ${entry_cost:.2f}")
             st.write(f"Maximum Return: ${max_profit:.2f}")
             st.write(f"Maximum Return on Risk: {max_return_on_risk * 100:.2f}%")
+            st.write(f"Percentage to Cover Entry Cost: {percentage_to_cover_entry_cost:.2f}%")
             st.write(f"Arithmetic-Mean POP: {mean_pop:.2f}%")
             st.write(f"Geometric-Mean POP: {geometric_mean_pop * 100:.2f}%")
 

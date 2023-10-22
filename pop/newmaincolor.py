@@ -43,7 +43,7 @@ custom_css = """
     color: white; /* Add white text color for visibility on red background */
 }
 
-medium-pop {
+.medium-pop {
     background-color: yellow;
 }
 
@@ -74,14 +74,11 @@ st.markdown(combined_styles, unsafe_allow_html=True)
 
 # Function to calculate POP for a specific combination of percentage and closing days
 def calculate_pop(percentage, closing_days, underlying, sigma, rate, trials, days_to_expiration, short_strike, short_price, long_strike, long_price):
-    try:
-        return poptions.putCreditSpread(
-            underlying, sigma, rate, trials, days_to_expiration,
-            [closing_days], [percentage], short_strike,
-            short_price, long_strike, long_price
-        )
-    except Exception as e:
-        return np.nan  # Return NaN for non-numeric or error values
+    return poptions.putCreditSpread(
+        underlying, sigma, rate, trials, days_to_expiration,
+        [closing_days], [percentage], short_strike,
+        short_price, long_strike, long_price
+    )
 
 # Define a custom colormap for POP values
 def custom_pop_colormap():
@@ -128,7 +125,7 @@ def main():
                 results = []
                 for percentage in percentage_array:
                     for closing_days in closing_days_array:
-                        results.append((int(percentage), int(closing_days)))
+                        results.append((int(percentage), int(closing_days))
 
                 pop_values = pool.starmap(calculate_pop, [(p, cd, underlying, sigma, rate, trials, days_to_expiration, short_strike, short_price, long_strike, long_price) for p, cd in results])
                 pool.close()
@@ -140,6 +137,10 @@ def main():
                     closing_days_int = int(closing_days)
                     pop_results.at[percentage_int, closing_days_int] = pop_value
 
+            # Display the calculated POP values in a table with cell background color
+            st.write("Calculated POP Values:")
+            st.dataframe(pop_results.style.applymap(color_pop_cells), height=800)
+
             # Create X and Y values for the scatter plot
             x_values = []
             y_values = []
@@ -149,21 +150,6 @@ def main():
 
             # Convert y_values to numeric values
             y_values_numeric = pd.to_numeric(y_values, errors='coerce')
-
-            # Calculate the mean of POP values
-            mean_pop = pop_results.stack().mean()
-
-            # Display the calculated values
-            st.write(f"Sigma: {sigma:.2f}%")
-            st.write(f"Days to Expiration: {days_to_expiration}")
-            st.write(f"Rate: {rate:.2f}%")
-
-            # Display the mean Probability of Profit (POP)
-            st.write(f"Mean Probability of Profit (POP): {mean_pop:.2f}")
-
-            # Display the calculated POP values in a table with cell background color
-            st.write("Calculated POP Values:")
-            st.dataframe(pop_results.style.applymap(color_pop_cells), height=800)
 
             # Create a scatter plot using Matplotlib with the custom colormap
             plt.figure(figsize=(10, 6))  # Adjust the figure size as needed
@@ -193,6 +179,15 @@ def main():
             max_profit = (short_price - long_price) * 100
             st.write(f"Maximum Profit: ${max_profit:.2f}")
 
+            # Calculate the mean of POP values
+            mean_pop = pop_results.stack().mean()
+
+            # Display the calculated values
+            st.write(f"Sigma: {sigma:.2f}%")
+            st.write(f"Days to Expiration: {days_to_expiration}")
+            st.write(f"Rate: {rate:.2f}%")
+            st.write(f"Mean POP: {mean_pop:.2f}%")
+    
     except Exception as e:
         st.error(f"An error occurred: {e}")
 

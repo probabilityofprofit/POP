@@ -85,7 +85,7 @@ def calculate_pop(percentage, closing_days, underlying, sigma, rate, trials, day
 # Define a custom colormap for POP values
 def custom_pop_colormap():
     # Define colors and their corresponding positions (from 0 to 1)
-    colors = [(0.0, 'red'), (0.5, 'yellow'), (1.0, 'green')]
+    colors = [(0.0, 'red'), (0.5, 'yellow'), (1.0, 'green')
     
     # Create the custom colormap
     return LinearSegmentedColormap.from_list('custom_pop_colormap', colors)
@@ -127,7 +127,7 @@ def main():
                 results = []
                 for percentage in percentage_array:
                     for closing_days in closing_days_array:
-                        results.append((int(percentage), int(closing_days)))
+                        results.append((int(percentage), int(closing_days))
 
                 # Ensure that the pop_values list contains numeric values
                 pop_values = pool.starmap(calculate_pop, [(p, cd, underlying, sigma, rate, trials, days_to_expiration, short_strike, short_price, long_strike, long_price) for p, cd in results])
@@ -185,9 +185,12 @@ def main():
             # Calculate and display the maximum profit
             max_profit = (short_price - long_price) * 100
 
+            # Calculate the maximum return on risk for put credit spreads
+            max_return_on_risk = max_profit / entry_cost
+
             # Calculate the mean of POP values
             mean_pop = pop_results.stack().mean()
-            
+
             # Calculate the geometric mean of POP values
             geometric_mean_pop = pop_results.stack().apply(lambda x: 1 + (x / 100)).prod() ** (1 / len(pop_results.stack())) - 1
 
@@ -196,7 +199,8 @@ def main():
             st.write(f"Maximum Return: ${max_profit:.2f}")
             st.write(f"Arithmetic-Mean POP: {mean_pop:.2f}%")
             st.write(f"Geometric-Mean POP: {geometric_mean_pop * 100:.2f}%")
-    
+            st.write(f"Maximum Return on Risk: {max_return_on_risk:.2f}")
+
     except Exception as e:
         st.error(f"An error occurred: {e}")
 

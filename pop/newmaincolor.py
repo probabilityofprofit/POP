@@ -43,11 +43,11 @@ custom_css = """
     color: white; /* Add white text color for visibility on red background */
 }
 
-medium-pop {
+.medium-pop {
     background-color: yellow;
 }
 
-high-pop {
+.high-pop {
     background-color: green;
     color: white; /* Add white text color for visibility on green background */
 }
@@ -85,7 +85,7 @@ def calculate_pop(percentage, closing_days, underlying, sigma, rate, trials, day
 # Define a custom colormap for POP values
 def custom_pop_colormap():
     # Define colors and their corresponding positions (from 0 to 1)
-    colors = [(0.0, 'red'), (0.5, 'yellow'), (1.0, 'green')]
+    colors = [(0.0, 'red'), (0.5, 'yellow'), (1.0, 'green')
     
     # Create the custom colormap
     return LinearSegmentedColormap.from_list('custom_pop_colormap', colors)
@@ -115,9 +115,6 @@ def main():
         # Create an empty DataFrame to store results
         pop_results = pd.DataFrame(index=percentage_array, columns=closing_days_array)
 
-        # Set a threshold for filtering out extremely high values
-        pop_threshold = 1e6  # Adjust this threshold based on your data
-
         # Add a "Calculate" button to trigger the calculation
         if st.button("Calculate"):
             # Use st.spinner to display a loading spinner while calculating
@@ -130,7 +127,7 @@ def main():
                 results = []
                 for percentage in percentage_array:
                     for closing_days in closing_days_array:
-                        results.append((int(percentage), int(closing_days)))
+                        results.append((int(percentage), int(closing_days))
 
                 # Ensure that the pop_values list contains numeric values
                 pop_values = pool.starmap(calculate_pop, [(p, cd, underlying, sigma, rate, trials, days_to_expiration, short_strike, short_price, long_strike, long_price) for p, cd in results])
@@ -142,9 +139,6 @@ def main():
                     percentage_int = int(percentage)
                     closing_days_int = int(closing_days)
                     pop_results.at[percentage_int, closing_days_int] = pop_value
-
-                # Filter out zero, negative, and extremely high POP values for the geometric mean calculation
-                filtered_pop_values = [pop for pop in pop_values if 0 < pop <= pop_threshold]
 
             # Display the calculated POP values in a table with cell background color
             st.write("Calculated POP Values:")
@@ -175,7 +169,7 @@ def main():
             coefficients = np.polyfit(x_values, y_values_numeric, degree)
 
             # Generate the trendline values
-            trendline_x = np.array([min(x_values), max(x_values)])
+            trendline_x = np.array([min(x_values), max(x_values))
             trendline_y = np.polyval(coefficients, trendline_x)
 
             # Plot the trendline
@@ -189,19 +183,17 @@ def main():
             max_profit = (short_price - long_price) * 100
             st.write(f"Maximum Profit: ${max_profit:.2f}")
 
-            # Calculate the mean of POP values
-            mean_pop = pop_results.stack().mean()
-
-            # Calculate the geometric mean of filtered POP values
-            geometric_mean_pop = np.prod(filtered_pop_values) ** (1 / len(filtered_pop_values))
+            # Filter out 0 values and calculate the geometric mean of POP values
+            filtered_pop_values = pop_results.stack()[pop_results.stack() > 0]
+            geometric_mean_pop = filtered_pop_values.prod() ** (1 / len(filtered_pop_values))
 
             # Display the calculated values
             st.write(f"Sigma: {sigma:.2f}%")
             st.write(f"Days to Expiration: {days_to_expiration}")
             st.write(f"Rate: {rate:.2f}%")
             st.write(f"Arithmetic-Mean POP: {mean_pop:.2f}%")
-            st.write(f"Geometric-Mean POP: {geometric_mean_pop:.2f}%")
-
+            st.write(f"Geometric-Mean POP (excluding 0 values): {geometric_mean_pop:.2f}%")
+    
     except Exception as e:
         st.error(f"An error occurred: {e}")
 

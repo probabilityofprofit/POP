@@ -104,130 +104,125 @@ def calculate_popbe(percentage_to_cover_entry_cost, percentage_array, pop_result
 
 # Streamlit UI
 def main():
-    try:
-        st.title("Call Credit Spread")
+    st.title("Call Credit Spread")
 
-        # Manual input of values
-        underlying = st.number_input("Enter the underlying price:", value=0.00, placeholder="e.g. 347.47", min_value=0.00)
-        sigma = st.number_input("Enter the sigma (volatility) as a percentage:", value=0.00, placeholder="e.g. 11.27", min_value=0.00)
-        rate = st.number_input("Enter the interest rate as a percentage:", value=0.00, placeholder="e.g. 5.28", min_value=0.00)
-        days_to_expiration = st.number_input("Enter the days to expiration:", placeholder="e.g. 9", min_value=0, step=1)
-        percentage_array = np.arange(1, 101)
-        trials = 2000
+    # Manual input of values
+    underlying = st.number_input("Enter the underlying price:", value=0.00, placeholder="e.g. 347.47", min_value=0.00)
+    sigma = st.number_input("Enter the sigma (volatility) as a percentage:", value=0.00, placeholder="e.g. 11.27", min_value=0.00)
+    rate = st.number_input("Enter the interest rate as a percentage:", value=0.00, placeholder="e.g. 5.28", min_value=0.00)
+    days_to_expiration = st.number_input("Enter the days to expiration:", placeholder="e.g. 9", min_value=0, step=1)
+    percentage_array = np.arange(1, 101)
+    trials = 2000
 
-        # Dynamically generate the closing_days_array based on days_to_expiration
-        closing_days_array = np.arange(1, days_to_expiration + 1)
+    # Dynamically generate the closing_days_array based on days_to_expiration
+    closing_days_array = np.arange(1, days_to_expiration + 1)
 
-        # Define the missing variables for manual input
-        short_strike = st.number_input("Enter the short strike:", value=0.00, placeholder="e.g. 350", min_value=0.00)
-        short_price = st.number_input("Enter the short price:", value=0.00, placeholder="e.g. 2.46", min_value=0.00)
-        long_strike = st.number_input("Enter the long strike:", value=0.00, placeholder="e.g. 347.50", min_value=0.00)
-        long_price = st.number_input("Enter the long price:", value=0.00, placeholder="e.g. 1.01", min_value=0.00)
+    # Define the missing variables for manual input
+    short_strike = st.number_input("Enter the short strike:", value=0.00, placeholder="e.g. 350", min_value=0.00)
+    short_price = st.number_input("Enter the short price:", value=0.00, placeholder="e.g. 2.46", min_value=0.00)
+    long_strike = st.number_input("Enter the long strike:", value=0.00, placeholder="e.g. 347.50", min_value=0.00)
+    long_price = st.number_input("Enter the long price:", value=0.00, placeholder="e.g. 1.01", min_value=0.00)
 
-        # Create an empty DataFrame to store results
-        pop_results = pd.DataFrame(index=percentage_array, columns=closing_days_array)
+    # Create an empty DataFrame to store results
+    pop_results = pd.DataFrame(index=percentage_array, columns=closing_days_array)
 
-        # Add a "Calculate" button to trigger the calculation
-        if st.button("Calculate"):
-            # Use st.spinner to display a loading spinner while calculating
-            with st.spinner("Calculating..."):
-                # Create a multiprocessing pool with the number of processes you want to use
-                num_processes = multiprocessing.cpu_count()  # Use all available CPU cores
-                pool = multiprocessing.Pool(processes=num_processes)
+    # Add a "Calculate" button to trigger the calculation
+    if st.button("Calculate"):
+        # Use st.spinner to display a loading spinner while calculating
+        with st.spinner("Calculating..."):
+            # Create a multiprocessing pool with the number of processes you want to use
+            num_processes = multiprocessing.cpu_count()  # Use all available CPU cores
+            pool = multiprocessing.Pool(processes=num_processes)
 
-                # Calculate POP values using multiprocessing
-                results = []
-                for percentage in percentage_array:
-                    for closing_days in closing_days_array:
-                        results.append((int(percentage), int(closing_days)))
+            # Calculate POP values using multiprocessing
+            results = []
+            for percentage in percentage_array:
+                for closing_days in closing_days_array:
+                    results.append((int(percentage), int(closing_days)))
 
-                # Ensure that the pop_values list contains numeric values
-                pop_values = pool.starmap(calculate_pop, [(p, cd, underlying, sigma, rate, trials, days_to_expiration, short_strike, short_price, long_strike, long_price) for p, cd in results])
-                pool.close()
-                pool.join()
+            # Ensure that the pop_values list contains numeric values
+            pop_values = pool.starmap(calculate_pop, [(p, cd, underlying, sigma, rate, trials, days_to_expiration, short_strike, short_price, long_strike, long_price) for p, cd in results])
+            pool.close()
+            pool.join()
 
-                # Fill the DataFrame with the calculated POP values
-                for (percentage, closing_days), pop_value in zip(results, pop_values):
-                    percentage_int = int(percentage)
-                    closing_days_int = int(closing_days)
-                    pop_results.at[percentage_int, closing_days_int] = pop_value
-
-            # Display the calculated POP values in a table with cell background color
-            st.write("Calculated POP Values:")
-            formatted_pop_results = pop_results.applymap(lambda x: f'{x:.2f}')
-            st.dataframe(formatted_pop_results.style.applymap(color_pop_cells), height=800)
-
-            # Create X and Y values for the scatter plot
-            x_values = []
-            y_values = []
+            # Fill the DataFrame with the calculated POP values
             for (percentage, closing_days), pop_value in zip(results, pop_values):
-                x_values.append(percentage)
-                y_values.append(pop_value)
+                percentage_int = int(percentage)
+                closing_days_int = int(closing_days)
+                pop_results.at[percentage_int, closing_days_int] = pop_value
 
-            # Convert y_values to numeric values
-            y_values_numeric = pd.to_numeric(y_values, errors='coerce')
+        # Display the calculated POP values in a table with cell background color
+        st.write("Calculated POP Values:")
+        formatted_pop_results = pop_results.applymap(lambda x: f'{x:.2f}')
+        st.dataframe(formatted_pop_results.style.applymap(color_pop_cells), height=800)
 
-            # Create a scatter plot using Matplotlib with the custom colormap
-            plt.figure(figsize=(10, 6))  # Adjust the figure size as needed
-            plt.scatter(x_values, y_values_numeric, c=y_values_numeric, cmap=custom_pop_colormap(), marker='o', edgecolor='k')
-            plt.colorbar(label='POP Value')
-            plt.xlabel('Percentage')
-            plt.ylabel('POP Value')
-            plt.title('Probability of Profit (POP) vs. Percentage')
-            plt.grid(True)
+        # Create X and Y values for the scatter plot
+        x_values = []
+        y_values = []
+        for (percentage, closing_days), pop_value in zip(results, pop_values):
+            x_values.append(percentage)
+            y_values.append(pop_value)
 
-            # Calculate the coefficients for the trendline
-            degree = 1  # Linear regression
-            coefficients = np.polyfit(x_values, y_values_numeric, degree)
+        # Convert y_values to numeric values
+        y_values_numeric = pd.to_numeric(y_values, errors='coerce')
 
-            # Generate the trendline values
-            trendline_x = np.array([min(x_values), max(x_values)])
-            trendline_y = np.polyval(coefficients, trendline_x)
+        # Create a scatter plot using Matplotlib with the custom colormap
+        plt.figure(figsize=(10, 6))  # Adjust the figure size as needed
+        plt.scatter(x_values, y_values_numeric, c=y_values_numeric, cmap=custom_pop_colormap(), marker='o', edgecolor='k')
+        plt.colorbar(label='POP Value')
+        plt.xlabel('Percentage')
+        plt.ylabel('POP Value')
+        plt.title('Probability of Profit (POP) vs. Percentage')
+        plt.grid(True)
 
-            # Plot the trendline
-            plt.plot(trendline_x, trendline_y, color='#0031ff', linestyle='--', label='Trendline')
+        # Calculate the coefficients for the trendline
+        degree = 1  # Linear regression
+        coefficients = np.polyfit(x_values, y_values_numeric, degree)
 
-            plt.legend()  # Show the legend with the trendline label
-            plt.tight_layout()
-            st.pyplot(plt)
+        # Generate the trendline values
+        trendline_x = np.array([min(x_values), max(x_values)])
+        trendline_y = np.polyval(coefficients, trendline_x)
 
-            # Calculate the entry cost for the call credit spread
-            entry_cost = ((short_strike - long_strike) + (short_price - long_price))*100
+        # Plot the trendline
+        plt.plot(trendline_x, trendline_y, color='#0031ff', linestyle='--', label='Trendline')
 
-            # Calculate and display the maximum profit
-            max_profit = (short_price - long_price) * 100
+        plt.legend()  # Show the legend with the trendline label
+        plt.tight_layout()
+        st.pyplot(plt)
 
-            # Calculate the maximum return on risk for call credit spreads
-            max_return_on_risk = max_profit / entry_cost
+        # Calculate the entry cost for the call credit spread
+        entry_cost = ((short_strike - long_strike) + (short_price - long_price))*100
 
-            # Calculate the percentage on the maximum return to make entry cost back
-            percentage_to_cover_entry_cost = (entry_cost / max_profit) * 100
+        # Calculate and display the maximum profit
+        max_profit = (short_price - long_price) * 100
 
-            # Calculate the mean of POP values
-            mean_pop = pop_results.stack().mean()
+        # Calculate the maximum return on risk for call credit spreads
+        max_return_on_risk = max_profit / entry_cost
 
-            # Calculate the geometric mean of POP values
-            geometric_mean_pop = pop_results.stack().apply(lambda x: 1 + (x / 100)).prod() ** (1 / len(pop_results.stack())) - 1
+        # Calculate the percentage on the maximum return to make entry cost back
+        percentage_to_cover_entry_cost = (entry_cost / max_profit) * 100
 
-            # Calculate breakevens at expiry for call credit spreads
-            underlying_breakeven = long_strike - (short_price - long_price)
+        # Calculate the mean of POP values
+        mean_pop = pop_results.stack().mean()
 
-            # Calculate the probability to breakeven (POPBE)
-            popbe = calculate_popbe(percentage_to_cover_entry_cost, percentage_array, pop_results)
+        # Calculate the geometric mean of POP values
+        geometric_mean_pop = pop_results.stack().apply(lambda x: 1 + (x / 100)).prod() ** (1 / len(pop_results.stack())) - 1
 
-            # Display the calculated values
-            st.write(f"Entry Cost: ${entry_cost:.2f}")
-            st.write(f"Maximum Return: ${max_profit:.2f}")
-            st.write(f"Maximum Return on Risk: {max_return_on_risk * 100:.2f}%")
-            st.write(f"Underlying Breakeven at Expiry: ${underlying_breakeven:.2f}")
-            st.write(f"Percentage to Cover Entry Cost: {percentage_to_cover_entry_cost:.2f}%")
-            st.write(f"Probability to Breakeven at Expiry: {popbe:.2f}%")
-            st.write(f"Arithmetic-Mean POP: {mean_pop:.2f}%")
-            st.write(f"Geometric-Mean POP: {geometric_mean_pop * 100:.2f}%")
+        # Calculate breakevens at expiry for call credit spreads
+        underlying_breakeven = long_strike - (short_price - long_price)
 
-    except Exception as e:
-        st.error(f"An error occurred: {e}")
+        # Calculate the probability to breakeven (POPBE)
+        popbe = calculate_popbe(percentage_to_cover_entry_cost, percentage_array, pop_results)
 
+        # Display the calculated values
+        st.write(f"Entry Cost: ${entry_cost:.2f}")
+        st.write(f"Maximum Return: ${max_profit:.2f}")
+        st.write(f"Maximum Return on Risk: {max_return_on_risk * 100:.2f}%")
+        st.write(f"Underlying Breakeven at Expiry: ${underlying_breakeven:.2f}")
+        st.write(f"Percentage to Cover Entry Cost: {percentage_to_cover_entry_cost:.2f}%")
+        st.write(f"Probability to Breakeven at Expiry: {popbe:.2f}%")
+        st.write(f"Arithmetic-Mean POP: {mean_pop:.2f}%")
+        st.write(f"Geometric-Mean POP: {geometric_mean_pop * 100:.2f}%")
 
 # Define a function to apply cell background color based on POP values
 def color_pop_cells(pop_value):

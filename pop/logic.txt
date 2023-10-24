@@ -1,0 +1,43 @@
+Put Credit Spread
+
+Xentry_cost = ((short_strike - long_strike) - (short_price - long_price))*100
+
+	((333-329)-(2.97-1.13))*100 = 2.16
+
+max_profit = (short_price - long_price) * 100
+
+	(2.97-1.13)*100 = 1.84
+
+max_return_on_risk = max_profit / entry_cost
+
+	1.84/2.16 = .852
+
+percentage_to_cover_entry_cost = (entry_cost / max_profit) * 100
+
+	(2.16/1.84)*100 = 117.39
+
+Xunderlying_breakeven = short_strike - (short_price - long_price)
+
+	333 - (2.97-1.13) = 331.16
+
+Call Credit Spread
+
+Xentry_cost = ((short_strike - long_strike) + (short_price - long_price))*100
+
+	((333-329)+(1.18-3.50)) = 1.68
+
+max_profit = (short_price - long_price) * 100
+
+	(3.50-1.18)*100 = 2.32
+
+max_return_on_risk = max_profit / entry_cost
+
+	2.32/1.68= 1.381
+
+percentage_to_cover_entry_cost = (entry_cost / max_profit) * 100
+
+	(1.68/2.32)*100 = 72.41
+
+Xunderlying_breakeven = long_strike - (short_price - long_price)
+
+	329 - (1.18-3.50) = 331.32

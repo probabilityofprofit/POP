@@ -225,7 +225,8 @@ def main():
             st.write(f"Arithmetic-Mean POP: {mean_pop:.2f}%")
             st.write(f"Geometric-Mean POP: {geometric_mean_pop * 100:.2f}%")
 
-
+    except Exception as e:
+        st.error(f"An error occurred: {e}")
 
 
 # Define a function to apply cell background color based on POP values

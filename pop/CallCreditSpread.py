@@ -4,6 +4,7 @@ import time
 from BlackScholes import blackScholesCall
 import numpy as np
 
+
 def bsm_debit(sim_price, strikes, rate, time_fraction, sigma):
     P_short_calls = blackScholesCall(sim_price, strikes[0], rate, time_fraction, sigma)
     P_long_calls = blackScholesCall(sim_price, strikes[1], rate, time_fraction, sigma)
@@ -51,11 +52,6 @@ def callCreditSpread(underlying, sigma, rate, trials, days_to_expiration,
     except RuntimeError as err:
         print(err.args)
 
-    response = {
-        "pop": pop,
-        "pop_error": pop_error,
-        "avg_dtc": avg_dtc,
-        "avg_dtc_error": avg_dtc_error
-    }
+    response = "   ".join(f"{value:.2f}" for value in pop)
 
     return response

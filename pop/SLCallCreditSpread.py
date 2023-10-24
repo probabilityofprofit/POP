@@ -192,7 +192,7 @@ def main():
             st.pyplot(plt)
 
             # Calculate the entry cost for the call credit spread
-            entry_cost = ((short_strike - long_strike) - (short_price - long_price))*100
+            entry_cost = ((short_strike - long_strike) + (short_price - long_price))*100
 
             # Calculate and display the maximum profit
             max_profit = (short_price - long_price) * 100
@@ -210,7 +210,7 @@ def main():
             geometric_mean_pop = pop_results.stack().apply(lambda x: 1 + (x / 100)).prod() ** (1 / len(pop_results.stack())) - 1
 
             # Calculate breakevens at expiry for call credit spreads
-            underlying_breakeven = short_strike - (short_price - long_price)
+            underlying_breakeven = long_strike - (short_price - long_price)
 
             # Calculate the probability to breakeven (POPBE)
             popbe = calculate_popbe(percentage_to_cover_entry_cost, percentage_array, pop_results)

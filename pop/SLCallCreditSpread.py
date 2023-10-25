@@ -204,7 +204,7 @@ def main():
             max_return_on_risk = max_profit / max_risk
 
             # Calculate the percentage on the maximum return to make Entry Credit back
-            percentage_to_cover_entry_credit = (entry_credit / max_profit) * 100
+            percentage_to_cover_entry_credit = (max_risk / max_profit) * 100
 
             # Calculate the mean of POP values
             mean_pop = pop_results.stack().mean()

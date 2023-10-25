@@ -112,7 +112,7 @@ def main():
         sigma = st.number_input("Enter the sigma (volatility) as a percentage:", value=0.00, placeholder="e.g. 11.27", min_value=0.00)
         rate = st.number_input("Enter the interest rate as a percentage:", value=0.00, placeholder="e.g. 5.28", min_value=0.00)
         days_to_expiration = st.number_input("Enter the days to expiration:", placeholder="e.g. 9", min_value=0, step=1)
-        percentage_array = np.arange(1, 141)
+        percentage_array = np.arange(1, 101)
         trials = 2000
 
         # Dynamically generate the closing_days_array based on days_to_expiration
@@ -192,16 +192,16 @@ def main():
             st.pyplot(plt)
 
             # Calculate the entry cost for the put credit spread
-            entry_cost = ((short_strike - long_strike) - (short_price - long_price))*100
+            max_risk = ((short_strike - long_strike) - (short_price - long_price))*100
 
             # Calculate and display the maximum profit
             max_profit = (short_price - long_price) * 100
 
             # Calculate the maximum return on risk for put credit spreads
-            max_return_on_risk = max_profit / entry_cost
+            max_return_on_risk = max_profit / max_risk
 
             # Calculate the percentage on the maximum return to make entry cost back
-            percentage_to_cover_entry_cost = (entry_cost / max_profit) * 100
+            percentage_to_cover_entry_cost = (max_risk / max_profit) * 100
 
             # Calculate the mean of POP values
             mean_pop = pop_results.stack().mean()
@@ -216,7 +216,7 @@ def main():
             popbe = calculate_popbe(percentage_to_cover_entry_cost, percentage_array, pop_results)
 
             # Display the calculated values
-            st.write(f"Entry Cost: ${entry_cost:.2f}")
+            st.write(f"Maximum Risk: ${max_risk:.2f}")
             st.write(f"Maximum Return: ${max_profit:.2f}")
             st.write(f"Maximum Return on Risk: {max_return_on_risk * 100:.2f}%")
             st.write(f"Underlying Breakeven at Expiry: ${underlying_breakeven:.2f}")

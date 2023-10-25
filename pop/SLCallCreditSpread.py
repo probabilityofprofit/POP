@@ -191,17 +191,20 @@ def main():
             plt.tight_layout()
             st.pyplot(plt)
 
+            # Calculate the entry cost for the put credit spread
+            entry_cost = (short_price - long_price)*100
+            
             # Calculate the entry cost for the call credit spread
-            entry_cost = ((long_strike - short_strike) + (long_price - short_price))*100
+            max_risk = ((long_strike - short_strike) + (long_price - short_price))*100
 
             # Calculate and display the maximum profit
             max_profit = (short_price - long_price) * 100
 
             # Calculate the maximum return on risk for call credit spreads
-            max_return_on_risk = max_profit / entry_cost
+            max_return_on_risk = max_profit / max_risk
 
             # Calculate the percentage on the maximum return to make entry cost back
-            percentage_to_cover_entry_cost = (entry_cost / max_profit) * 100
+            percentage_to_cover_entry_cost = (entry_cost / max_risk) * 100
 
             # Calculate the mean of POP values
             mean_pop = pop_results.stack().mean()
@@ -217,6 +220,7 @@ def main():
 
             # Display the calculated values
             st.write(f"Entry Cost: ${entry_cost:.2f}")
+            st.write(f"Maximum Risk: ${max_risk:.2f}")
             st.write(f"Maximum Return: ${max_profit:.2f}")
             st.write(f"Maximum Return on Risk: {max_return_on_risk * 100:.2f}%")
             st.write(f"Underlying Breakeven at Expiry: ${underlying_breakeven:.2f}")

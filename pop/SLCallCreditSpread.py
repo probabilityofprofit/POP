@@ -200,6 +200,9 @@ def main():
             # Calculate breakevens at expiry for call credit spreads
             underlying_breakeven = short_strike + (short_price - long_price)
 
+            # Calculate the sum of values in the last available column of pop_results
+            last_column_sum = pop_results.iloc[:, -1].sum()
+            
             # Display the calculated values
             st.write(f"Entry Credit: ${entry_credit:.2f}")
             st.write(f"Maximum Risk: ${max_risk:.2f}")
@@ -208,6 +211,7 @@ def main():
             st.write(f"Underlying Breakeven at Expiry: ${underlying_breakeven:.2f}")
             st.write(f"Arithmetic-Mean POP: {mean_pop:.2f}%")
             st.write(f"Geometric-Mean POP: {geometric_mean_pop * 100:.2f}%")
+            st.write(f"Sum of Values in Last Column: {last_column_sum:.2f}")
 
     except Exception as e:
         st.error(f"An error occurred: {e}")

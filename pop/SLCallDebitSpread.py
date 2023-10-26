@@ -75,7 +75,7 @@ st.markdown(combined_styles, unsafe_allow_html=True)
 # Function to calculate POP for a specific combination of percentage and closing days
 def calculate_pop(percentage, closing_days, underlying, sigma, rate, trials, days_to_expiration, short_strike, short_price, long_strike, long_price):
     # Calculate POP and convert the result to a float with two decimal places
-    pop_value = float(poptions.callCreditSpread(
+    pop_value = float(poptions.callDebitSpread(
         underlying, sigma, rate, trials, days_to_expiration,
         [closing_days], [percentage], short_strike,
         short_price, long_strike, long_price

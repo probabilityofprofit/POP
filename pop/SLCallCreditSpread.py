@@ -201,7 +201,7 @@ def main():
             underlying_breakeven = short_strike + (short_price - long_price)
 
             # Calculate the sum of values in the last available column of pop_results
-            last_column_sum = pop_results.iloc[:, -1].sum()
+            last_column_sum = (pop_results.iloc[:, -1].sum()) / 100
             
             # Display the calculated values
             st.write(f"Entry Credit: ${entry_credit:.2f}")

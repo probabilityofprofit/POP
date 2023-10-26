@@ -92,7 +92,6 @@ def custom_pop_colormap():
 
 # Streamlit UI
 def main():
-    try:
         st.title("Call Debit Spread")
 
         # Manual input of values
@@ -212,10 +211,6 @@ def main():
             st.write(f"Arithmetic-Mean POP: {mean_pop:.2f}%")
             st.write(f"Geometric-Mean POP: {geometric_mean_pop * 100:.2f}%")
             st.write(f"Probability of Profit: {probability_of_profit:.2f}%")
-
-    
-    except Exception as e:
-        st.error(f"An error occurred: {e}")
 
 # Define a function to apply cell background color based on POP values
 def color_pop_cells(pop_value):

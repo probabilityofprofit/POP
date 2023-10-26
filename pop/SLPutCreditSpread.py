@@ -90,18 +90,6 @@ def custom_pop_colormap():
     # Create the custom colormap
     return LinearSegmentedColormap.from_list('custom_pop_colormap', colors)
 
-# Function to calculate the probability to breakeven (POPBE)
-def calculate_popbe(percentage_to_cover_max_risk, percentage_array, pop_results):
-    # Round the percentage to cover entry cost to the nearest integer
-    rounded_percentage = round(percentage_to_cover_max_risk)
-
-    # Get the last day of days_to_expiration
-    last_day = max(pop_results.columns)
-
-    # Find the corresponding POP value for the rounded percentage on the last day
-    popbe = pop_results.at[rounded_percentage, last_day]
-    return popbe
-
 # Streamlit UI
 def main():
     try:
@@ -203,9 +191,6 @@ def main():
             # Calculate the maximum return on risk for put credit spreads
             max_return_on_risk = max_profit / max_risk
 
-            # Calculate the percentage on the maximum return to make Max Risk back
-            percentage_to_cover_max_risk = (max_risk / max_profit) * 100
-
             # Calculate the mean of POP values
             mean_pop = pop_results.stack().mean()
 
@@ -215,17 +200,12 @@ def main():
             # Calculate breakevens at expiry for put credit spreads
             underlying_breakeven = short_strike - (short_price - long_price)
 
-            # Calculate the probability to breakeven (POPBE)
-            popbe = calculate_popbe(percentage_to_cover_max_risk, percentage_array, pop_results)
-
             # Display the calculated values
             st.write(f"Entry Credit: ${entry_credit:.2f}")
             st.write(f"Maximum Risk: ${max_risk:.2f}")
             st.write(f"Maximum Return: ${max_profit:.2f}")
             st.write(f"Maximum Return on Risk: {max_return_on_risk * 100:.2f}%")
             st.write(f"Underlying Breakeven at Expiry: ${underlying_breakeven:.2f}")
-            st.write(f"Percentage to Cover Maximum Risk: {percentage_to_cover_max_risk:.2f}%")
-            st.write(f"Probability to Breakeven at Expiry: {popbe:.2f}%")
             st.write(f"Arithmetic-Mean POP: {mean_pop:.2f}%")
             st.write(f"Geometric-Mean POP: {geometric_mean_pop * 100:.2f}%")
 

@@ -5,6 +5,7 @@ import poptions
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 from concurrent.futures import ProcessPoolExecutor
+import multiprocessing
 
 # Define the style to hide Streamlit elements
 hide_streamlit_style = """

@@ -73,11 +73,11 @@ combined_styles = hide_streamlit_style + custom_css
 st.markdown(combined_styles, unsafe_allow_html=True)
 
 # Function to calculate POP for a specific combination of percentage and closing days
-def calculate_pop(percentage, closing_days, underlying, sigma, rate, trials, days_to_expiration, long_strike, long_price):
+def calculate_pop(multiple, closing_days, underlying, sigma, rate, trials, days_to_expiration, long_strike, long_price):
     # Calculate POP and convert the result to a float with two decimal places
     pop_value = float(poptions.longCall(
         underlying, sigma, rate, trials, days_to_expiration,
-        [closing_days], [percentage], long_strike, long_price
+        [closing_days], [multiple], long_strike, long_price
     ))
     return pop_value
 
@@ -99,7 +99,7 @@ def main():
         sigma = st.number_input("Enter the sigma (volatility) as a percentage:", value=0.00, placeholder="e.g. 11.27", min_value=0.00)
         rate = st.number_input("Enter the interest rate as a percentage:", value=0.00, placeholder="e.g. 5.28", min_value=0.00)
         days_to_expiration = st.number_input("Enter the days to expiration:", placeholder="e.g. 9", min_value=0, step=1)
-        percentage_array = np.arange(1, 101)
+        multiple_array = np.arange(1, 101)
         trials = 2000
 
         # Dynamically generate the closing_days_array based on days_to_expiration
@@ -110,7 +110,7 @@ def main():
         long_price = st.number_input("Enter the long price:", value=0.00, placeholder="e.g. 1.01", min_value=0.00)
 
         # Create an empty DataFrame to store results
-        pop_results = pd.DataFrame(index=percentage_array, columns=closing_days_array)
+        pop_results = pd.DataFrame(index=multiple_array, columns=closing_days_array)
 
         # Add a "Calculate" button to trigger the calculation
         if st.button("Calculate"):
@@ -122,9 +122,9 @@ def main():
 
                 # Calculate POP values using multiprocessing
                 results = []
-                for percentage in percentage_array:
+                for multiple in multiple_array:
                     for closing_days in closing_days_array:
-                        results.append((int(percentage), int(closing_days)))
+                        results.append((int(multiple), int(closing_days)))
 
                 # Ensure that the pop_values list contains numeric values
                 pop_values = pool.starmap(calculate_pop, [(p, cd, underlying, sigma, rate, trials, days_to_expiration, long_strike, long_price) for p, cd in results])
@@ -132,10 +132,10 @@ def main():
                 pool.join()
 
                 # Fill the DataFrame with the calculated POP values
-                for (percentage, closing_days), pop_value in zip(results, pop_values):
-                    percentage_int = int(percentage)
+                for (multiple, closing_days), pop_value in zip(results, pop_values):
+                    multiple_int = int(multiple)
                     closing_days_int = int(closing_days)
-                    pop_results.at[percentage_int, closing_days_int] = pop_value
+                    pop_results.at[multiple_int, closing_days_int] = pop_value
 
             # Display the calculated POP values in a table with cell background color
             st.write("Calculated POP Values:")
@@ -145,8 +145,8 @@ def main():
             # Create X and Y values for the scatter plot
             x_values = []
             y_values = []
-            for (percentage, closing_days), pop_value in zip(results, pop_values):
-                x_values.append(percentage)
+            for (multiple, closing_days), pop_value in zip(results, pop_values):
+                x_values.append(multiple)
                 y_values.append(pop_value)
 
             # Convert y_values to numeric values

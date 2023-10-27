@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import multiprocessing
-from multiprocessing import Manager
 import poptions
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
@@ -48,7 +47,7 @@ custom_css = """
     background-color: yellow;
 }
 
-.high-pop {
+high-pop {
     background-color: green;
     color: white; /* Add white text color for visibility on green background */
 }
@@ -73,18 +72,14 @@ combined_styles = hide_streamlit_style + custom_css
 
 st.markdown(combined_styles, unsafe_allow_html=True)
 
-# Create a Manager to manage a shared dictionary for results
-manager = Manager()
-pop_results = manager.dict()
-
 # Function to calculate POP for a specific combination of percentage and closing days
-def calculate_pop(multiple, closing_days, underlying, sigma, rate, trials, days_to_expiration, long_strike, long_price):
+def calculate_pop(result_list, multiple, closing_days, underlying, sigma, rate, trials, days_to_expiration, long_strike, long_price):
     # Calculate POP and convert the result to a float with two decimal places
     pop_value = float(poptions.longCall(
         underlying, sigma, rate, trials, days_to_expiration,
         [closing_days], [multiple], long_strike, long_price
     ))
-    pop_results[(multiple, closing_days)] = pop_value
+    result_list.append((multiple, closing_days, pop_value))
 
 # Define a custom colormap for POP values
 def custom_pop_colormap():
@@ -115,42 +110,43 @@ def main():
         long_price = st.number_input("Enter the long price:", value=0.00, placeholder="e.g. 1.01", min_value=0.00)
 
         # Create an empty DataFrame to store results
-        pop_results_df = pd.DataFrame(index=multiple_array, columns=closing_days_array)
+        pop_results = pd.DataFrame(index=multiple_array, columns=closing_days_array)
 
         # Add a "Calculate" button to trigger the calculation
         if st.button("Calculate"):
             # Use st.spinner to display a loading spinner while calculating
             with st.spinner("Calculating..."):
-                # Calculate POP values using multiprocessing
-                results = []
-                for multiple in multiple_array:
-                    for closing_days in closing_days_array:
-                        results.append((int(multiple), int(closing_days))
-
                 # Create a multiprocessing pool with the number of processes you want to use
                 num_processes = multiprocessing.cpu_count()  # Use all available CPU cores
                 pool = multiprocessing.Pool(processes=num_processes)
 
+                # Use a manager list to store the results safely
+                manager = multiprocessing.Manager()
+                result_list = manager.list()
+
                 # Calculate POP values using multiprocessing
-                pool.starmap(calculate_pop, [(p, cd, underlying, sigma, rate, trials, days_to_expiration, long_strike, long_price) for p, cd in results])
+                for multiple in multiple_array:
+                    for closing_days in closing_days_array:
+                        pool.apply_async(calculate_pop, args=(result_list, multiple, closing_days, underlying, sigma, rate, trials, days_to_expiration, long_strike, long_price))
+
                 pool.close()
                 pool.join()
 
-                # Fill the DataFrame with the calculated POP values
-                for (multiple, closing_days), pop_value in pop_results.items():
+                # Fill the DataFrame with the calculated POP values from the result list
+                for multiple, closing_days, pop_value in result_list:
                     multiple_int = int(multiple)
                     closing_days_int = int(closing_days)
-                    pop_results_df.at[multiple_int, closing_days_int] = pop_value
+                    pop_results.at[multiple_int, closing_days_int] = pop_value
 
             # Display the calculated POP values in a table with cell background color
             st.write("Calculated POP Values:")
-            formatted_pop_results = pop_results_df.applymap(lambda x: f'{x:.2f}')
+            formatted_pop_results = pop_results.applymap(lambda x: f'{x:.2f}')
             st.dataframe(formatted_pop_results.style.applymap(color_pop_cells), height=800)
 
             # Create X and Y values for the scatter plot
             x_values = []
             y_values = []
-            for (multiple, closing_days), pop_value in pop_results.items():
+            for (multiple, closing_days), pop_value in zip(result_list, pop_values):
                 x_values.append(multiple)
                 y_values.append(pop_value)
 
@@ -194,16 +190,16 @@ def main():
             max_return_on_risk = max_profit / max_risk
 
             # Calculate the mean of POP values
-            mean_pop = pop_results_df.stack().mean()
+            mean_pop = pop_results.stack().mean()
 
             # Calculate the geometric mean of POP values
-            geometric_mean_pop = pop_results_df.stack().apply(lambda x: 1 + (x / 100)).prod() ** (1 / len(pop_results_df.stack())) - 1
+            geometric_mean_pop = pop_results.stack().apply(lambda x: 1 + (x / 100)).prod() ** (1 / len(pop_results.stack())) - 1
 
             # Calculate breakevens at expiry for call credit spreads
             underlying_breakeven = short_strike + (short_price - long_price)
 
-            # Calculate the sum of values in the last available column of pop_results_df
-            probability_of_profit = (pop_results_df.iloc[:, -1].sum()) / 100
+            # Calculate the sum of values in the last available column of pop_results
+            probability_of_profit = (pop_results.iloc[:, -1].sum()) / 100
             
             # Display the calculated values
             st.write(f"Entry Credit: ${entry_credit:.2f}")

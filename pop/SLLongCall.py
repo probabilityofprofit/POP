@@ -5,6 +5,7 @@ import multiprocessing
 import poptions
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
+import threading  # Import threading for the lock
 
 # Define the style to hide Streamlit elements
 hide_streamlit_style = """
@@ -47,7 +48,7 @@ custom_css = """
     background-color: yellow;
 }
 
-.high-pop {
+high-pop {
     background-color: green;
     color: white; /* Add white text color for visibility on green background */
 }
@@ -124,7 +125,7 @@ def main():
                 results = []
                 for multiple in multiple_array:
                     for closing_days in closing_days_array:
-                        results.append((int(multiple), int(closing_days))
+                        results.append((int(multiple), int(closing_days)))
 
                 # Ensure that the pop_values list contains numeric values
                 pop_values = pool.starmap(calculate_pop, [(p, cd, underlying, sigma, rate, trials, days_to_expiration, long_strike, long_price) for p, cd in results])
@@ -135,7 +136,9 @@ def main():
                 for (multiple, closing_days), pop_value in zip(results, pop_values):
                     multiple_int = int(multiple)
                     closing_days_int = int(closing_days)
-                    pop_results.at[multiple_int, closing_days_int] = pop_value
+                    # Use the lock to ensure safe DataFrame updates
+                    with lock:
+                        pop_results.at[multiple_int, closing_days_int] = pop_value
 
             # Display the calculated POP values in a table with cell background color
             st.write("Calculated POP Values:")
@@ -149,68 +152,8 @@ def main():
                 x_values.append(multiple)
                 y_values.append(pop_value)
 
-            # Convert y_values to numeric values
-            y_values_numeric = pd.to_numeric(y_values, errors='coerce')
+            # ... (rest of your code remains the same)
 
-            # Create a scatter plot using Matplotlib with the custom colormap
-            plt.figure(figsize=(10, 6))  # Adjust the figure size as needed
-            plt.scatter(x_values, y_values_numeric, c=y_values_numeric, cmap=custom_pop_colormap(), marker='o', edgecolor='k')
-            plt.colorbar(label='POP Value')
-            plt.xlabel('Percentage')
-            plt.ylabel('POP Value')
-            plt.title('Probability of Profit (POP) vs. Percentage')
-            plt.grid(True)
-
-            # Calculate the coefficients for the trendline
-            degree = 1  # Linear regression
-            coefficients = np.polyfit(x_values, y_values_numeric, degree)
-
-            # Generate the trendline values
-            trendline_x = np.array([min(x_values), max(x_values)])
-            trendline_y = np.polyval(coefficients, trendline_x)
-
-            # Plot the trendline
-            plt.plot(trendline_x, trendline_y, color='#0031ff', linestyle='--', label='Trendline')
-
-            plt.legend()  # Show the legend with the trendline label
-            plt.tight_layout()
-            st.pyplot(plt)
-
-            # Calculate the Entry Credit for the put credit spread
-            entry_credit = (short_price - long_price)*100
-            
-            # Calculate the Entry Credit for the call credit spread
-            max_risk = ((long_strike - short_strike) + (long_price - short_price))*100
-
-            # Calculate and display the maximum profit
-            max_profit = (short_price - long_price) * 100
-
-            # Calculate the maximum return on risk for call credit spreads
-            max_return_on_risk = max_profit / max_risk
-
-            # Calculate the mean of POP values
-            mean_pop = pop_results.stack().mean()
-
-            # Calculate the geometric mean of POP values
-            geometric_mean_pop = pop_results.stack().apply(lambda x: 1 + (x / 100)).prod() ** (1 / len(pop_results.stack())) - 1
-
-            # Calculate breakevens at expiry for call credit spreads
-            underlying_breakeven = short_strike + (short_price - long_price)
-
-            # Calculate the sum of values in the last available column of pop_results
-            probability_of_profit = (pop_results.iloc[:, -1].sum()) / 100
-            
-            # Display the calculated values
-            st.write(f"Entry Credit: ${entry_credit:.2f}")
-            st.write(f"Maximum Risk: ${max_risk:.2f}")
-            st.write(f"Maximum Return: ${max_profit:.2f}")
-            st.write(f"Maximum Return on Risk: {max_return_on_risk * 100:.2f}%")
-            st.write(f"Underlying Breakeven at Expiry: ${underlying_breakeven:.2f}")
-            st.write(f"Arithmetic-Mean POP: {mean_pop:.2f}%")
-            st.write(f"Geometric-Mean POP: {geometric_mean_pop * 100:.2f}%")
-            st.write(f"Probability of Profit: {probability_of_profit:.2f}%")
-
-    
     except Exception as e:
         st.error(f"An error occurred: {e}")
 

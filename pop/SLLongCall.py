@@ -1,11 +1,10 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import multiprocessing
 import poptions
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
-from concurrent.futures import ProcessPoolExecutor
-import multiprocessing
 
 # Define the style to hide Streamlit elements
 hide_streamlit_style = """
@@ -48,7 +47,7 @@ custom_css = """
     background-color: yellow;
 }
 
-high-pop {
+.high-pop {
     background-color: green;
     color: white; /* Add white text color for visibility on green background */
 }
@@ -117,20 +116,20 @@ def main():
         if st.button("Calculate"):
             # Use st.spinner to display a loading spinner while calculating
             with st.spinner("Calculating..."):
-                # Create a ProcessPoolExecutor with the number of processes you want to use
+                # Create a multiprocessing pool with the number of processes you want to use
                 num_processes = multiprocessing.cpu_count()  # Use all available CPU cores
-                with ProcessPoolExecutor(max_workers=num_processes) as executor:
-                    # Calculate POP values using multiprocessing
-                    results = []
-                    for multiple in multiple_array:
-                        for closing_days in closing_days_array:
-                            results.append((multiple, closing_days))
+                pool = multiprocessing.Pool(processes=num_processes)
 
-                    # Ensure that the pop_values list contains numeric values
-                    pop_values = list(executor.map(
-                        calculate_pop,
-                        [(p, cd, underlying, sigma, rate, trials, days_to_expiration, long_strike, long_price) for p, cd in results]
-                    ))
+                # Calculate POP values using multiprocessing
+                results = []
+                for multiple in multiple_array:
+                    for closing_days in closing_days_array:
+                        results.append((multiple), int(closing_days)))
+
+                # Ensure that the pop_values list contains numeric values
+                pop_values = pool.starmap(calculate_pop, [(p, cd, underlying, sigma, rate, trials, days_to_expiration, long_strike, long_price) for p, cd in results])
+                pool.close()
+                pool.join()
 
                 # Fill the DataFrame with the calculated POP values
                 for (multiple, closing_days), pop_value in zip(results, pop_values):
@@ -211,6 +210,7 @@ def main():
             st.write(f"Geometric-Mean POP: {geometric_mean_pop * 100:.2f}%")
             st.write(f"Probability of Profit: {probability_of_profit:.2f}%")
 
+    
     except Exception as e:
         st.error(f"An error occurred: {e}")
 

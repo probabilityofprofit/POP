@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import multiprocessing
 import poptions
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
@@ -116,26 +115,11 @@ def main():
         if st.button("Calculate"):
             # Use st.spinner to display a loading spinner while calculating
             with st.spinner("Calculating..."):
-                # Create a multiprocessing pool with the number of processes you want to use
-                num_processes = multiprocessing.cpu_count()  # Use all available CPU cores
-                pool = multiprocessing.Pool(processes=num_processes)
-
-                # Calculate POP values using multiprocessing
-                results = []
+                # Calculate POP values sequentially
                 for multiple in multiple_array:
                     for closing_days in closing_days_array:
-                        results.append((int(multiple), int(closing_days)))
-
-                # Ensure that the pop_values list contains numeric values
-                pop_values = pool.starmap(calculate_pop, [(p, cd, underlying, sigma, rate, trials, days_to_expiration, long_strike, long_price) for p, cd in results])
-                pool.close()
-                pool.join()
-
-                # Fill the DataFrame with the calculated POP values
-                for (multiple, closing_days), pop_value in zip(results, pop_values):
-                    multiple_int = int(multiple)
-                    closing_days_int = int(closing_days)
-                    pop_results.at[multiple_int, closing_days_int] = pop_value
+                        pop_value = calculate_pop(multiple, closing_days, underlying, sigma, rate, trials, days_to_expiration, long_strike, long_price)
+                        pop_results.at[multiple, closing_days] = pop_value
 
             # Display the calculated POP values in a table with cell background color
             st.write("Calculated POP Values:")
@@ -149,9 +133,12 @@ def main():
                 x_values.append(multiple)
                 y_values.append(pop_value)
 
+            # Convert y_values to numeric values
+            y_values_numeric = pd.to_numeric(y_values, errors='coerce')
+
             # Create a scatter plot using Matplotlib with the custom colormap
             plt.figure(figsize=(10, 6))  # Adjust the figure size as needed
-            plt.scatter(x_values, y_values, c=y_values, cmap=custom_pop_colormap(), marker='o', edgecolor='k')
+            plt.scatter(x_values, y_values_numeric, c=y_values_numeric, cmap=custom_pop_colormap(), marker='o', edgecolor='k')
             plt.colorbar(label='POP Value')
             plt.xlabel('Percentage')
             plt.ylabel('POP Value')
@@ -160,10 +147,10 @@ def main():
 
             # Calculate the coefficients for the trendline
             degree = 1  # Linear regression
-            coefficients = np.polyfit(x_values, y_values, degree)
+            coefficients = np.polyfit(x_values, y_values_numeric, degree)
 
             # Generate the trendline values
-            trendline_x = np.array([min(x_values), max(x_values)]
+            trendline_x = np.array([min(x_values), max(x_values)])
             trendline_y = np.polyval(coefficients, trendline_x)
 
             # Plot the trendline
@@ -175,7 +162,7 @@ def main():
 
             # Calculate the Entry Credit for the put credit spread
             entry_credit = (short_price - long_price)*100
-
+            
             # Calculate the Entry Credit for the call credit spread
             max_risk = ((long_strike - short_strike) + (long_price - short_price))*100
 
@@ -196,7 +183,7 @@ def main():
 
             # Calculate the sum of values in the last available column of pop_results
             probability_of_profit = (pop_results.iloc[:, -1].sum()) / 100
-
+            
             # Display the calculated values
             st.write(f"Entry Credit: ${entry_credit:.2f}")
             st.write(f"Maximum Risk: ${max_risk:.2f}")
@@ -206,20 +193,24 @@ def main():
             st.write(f"Arithmetic-Mean POP: {mean_pop:.2f}%")
             st.write(f"Geometric-Mean POP: {geometric_mean_pop * 100:.2f}%")
             st.write(f"Probability of Profit: {probability_of_profit:.2f}%")
-
+    
     except Exception as e:
         st.error(f"An error occurred: {e}")
 
-# Modify the color_pop_cells function to handle data types without conversion
+# Define a function to apply cell background color based on POP values
 def color_pop_cells(pop_value):
-    if not pd.isna(pop_value):
-        if pop_value <= 30:
+    # Convert pop_value to a numeric value, handling non-numeric and NaN values
+    pop_value_numeric = pd.to_numeric(pop_value, errors='coerce')
+
+    if not pd.isna(pop_value_numeric):
+        if pop_value_numeric <= 30:
             return 'background-color: red'
-        elif pop_value <= 50:
+        elif pop_value_numeric <= 50:
             return 'background-color: yellow'
         else:
             return 'background-color: green'
     else:
+        # Handle non-numeric or NaN values gracefully by returning an empty string
         return ''
 
 if __name__ == "__main__":

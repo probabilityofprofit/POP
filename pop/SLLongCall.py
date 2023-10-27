@@ -1,10 +1,10 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import multiprocessing
 import poptions
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
-import multiprocessing
 
 # Define the style to hide Streamlit elements
 hide_streamlit_style = """
@@ -73,23 +73,19 @@ combined_styles = hide_streamlit_style + custom_css
 st.markdown(combined_styles, unsafe_allow_html=True)
 
 # Function to calculate POP for a specific combination of percentage and closing days
-def calculate_pop(args):
-    try:
-        multiple, closing_days, underlying, sigma, rate, trials, days_to_expiration, long_strike, long_price = args
-        # Calculate POP and convert the result to a float with two decimal places
-        pop_value = float(poptions.longCall(
-            underlying, sigma, rate, trials, days_to_expiration,
-            [closing_days], [multiple], long_strike, long_price
-        ))
-        return (multiple, closing_days, pop_value)
-    except Exception as e:
-        return (multiple, closing_days, float('nan'))
+def calculate_pop(multiple, closing_days, underlying, sigma, rate, trials, days_to_expiration, long_strike, long_price):
+    # Calculate POP and convert the result to a float with two decimal places
+    pop_value = float(poptions.longCall(
+        underlying, sigma, rate, trials, days_to_expiration,
+        [closing_days], [multiple], long_strike, long_price
+    ))
+    return pop_value
 
 # Define a custom colormap for POP values
 def custom_pop_colormap():
     # Define colors and their corresponding positions (from 0 to 1)
-    colors = [(0.0, 'red'), (0.5, 'yellow'), (1.0, 'green')
-              ]
+    colors = [(0.0, 'red'), (0.5, 'yellow'), (1.0, 'green')]
+    
     # Create the custom colormap
     return LinearSegmentedColormap.from_list('custom_pop_colormap', colors)
 
@@ -120,21 +116,18 @@ def main():
         if st.button("Calculate"):
             # Use st.spinner to display a loading spinner while calculating
             with st.spinner("Calculating..."):
+                # Create a multiprocessing pool with the number of processes you want to use
+                num_processes = multiprocessing.cpu_count()  # Use all available CPU cores
+                pool = multiprocessing.Pool(processes=num_processes)
+
                 # Calculate POP values using multiprocessing
                 results = []
                 for multiple in multiple_array:
                     for closing_days in closing_days_array:
                         results.append((int(multiple), int(closing_days)))
 
-                # Calculate POP values using multiprocessing
-                num_processes = multiprocessing.cpu_count()
-                pool = multiprocessing.Pool(processes=num_processes)
-                pop_values = pool.map(calculate_pop, [(p, cd, underlying, sigma, rate, trials, days_to_expiration, long_strike, long_price) for p, cd in results])
-                pool.close()
-                pool.join()
-
                 # Fill the DataFrame with the calculated POP values
-                for multiple, closing_days, pop_value in pop_values:
+                for (multiple, closing_days), pop_value in zip(results, pop_values):
                     multiple_int = int(multiple)
                     closing_days_int = int(closing_days)
                     pop_results.at[multiple_int, closing_days_int] = pop_value
@@ -179,10 +172,10 @@ def main():
             st.pyplot(plt)
 
             # Calculate the Entry Credit for the put credit spread
-            entry_credit = (short_price - long_price) * 100
-
+            entry_credit = (short_price - long_price)*100
+            
             # Calculate the Entry Credit for the call credit spread
-            max_risk = ((long_strike - short_strike) + (long_price - short_price)) * 100
+            max_risk = ((long_strike - short_strike) + (long_price - short_price))*100
 
             # Calculate and display the maximum profit
             max_profit = (short_price - long_price) * 100
@@ -201,7 +194,7 @@ def main():
 
             # Calculate the sum of values in the last available column of pop_results
             probability_of_profit = (pop_results.iloc[:, -1].sum()) / 100
-
+            
             # Display the calculated values
             st.write(f"Entry Credit: ${entry_credit:.2f}")
             st.write(f"Maximum Risk: ${max_risk:.2f}")
@@ -212,6 +205,7 @@ def main():
             st.write(f"Geometric-Mean POP: {geometric_mean_pop * 100:.2f}%")
             st.write(f"Probability of Profit: {probability_of_profit:.2f}%")
 
+    
     except Exception as e:
         st.error(f"An error occurred: {e}")
 

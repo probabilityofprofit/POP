@@ -5,7 +5,6 @@ import multiprocessing
 import poptions
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
-import threading  # Import threading for the lock
 
 # Define the style to hide Streamlit elements
 hide_streamlit_style = """
@@ -74,7 +73,7 @@ combined_styles = hide_streamlit_style + custom_css
 st.markdown(combined_styles, unsafe_allow_html=True)
 
 # Function to calculate POP for a specific combination of percentage and closing days
-def calculate_pop(multiple, closing_days, underlying, sigma, rate, trials, days_to_expiration, long_strike, long_price):
+def calculate_pop_single(multiple, closing_days, underlying, sigma, rate, trials, days_to_expiration, long_strike, long_price):
     # Calculate POP and convert the result to a float with two decimal places
     pop_value = float(poptions.longCall(
         underlying, sigma, rate, trials, days_to_expiration,
@@ -82,13 +81,11 @@ def calculate_pop(multiple, closing_days, underlying, sigma, rate, trials, days_
     ))
     return pop_value
 
-# Define a custom colormap for POP values
-def custom_pop_colormap():
-    # Define colors and their corresponding positions (from 0 to 1)
-    colors = [(0.0, 'red'), (0.5, 'yellow'), (1.0, 'green')]
-    
-    # Create the custom colormap
-    return LinearSegmentedColormap.from_list('custom_pop_colormap', colors)
+# Calculate POP values for a single combination using multiprocessing
+def calculate_pop_combination(combination, underlying, sigma, rate, trials, days_to_expiration, long_strike, long_price):
+    multiple, closing_days = combination
+    pop_value = calculate_pop_single(multiple, closing_days, underlying, sigma, rate, trials, days_to_expiration, long_strike, long_price)
+    return multiple, closing_days, pop_value
 
 # Streamlit UI
 def main():
@@ -127,21 +124,19 @@ def main():
                     for closing_days in closing_days_array:
                         results.append((int(multiple), int(closing_days)))
 
-                # Ensure that the pop_values list contains numeric values
-                pop_values = pool.starmap(calculate_pop, [(p, cd, underlying, sigma, rate, trials, days_to_expiration, long_strike, long_price) for p, cd in results])
+                # Calculate POP values using multiprocessing
+                pop_values = pool.starmap(
+                    calculate_pop_combination,
+                    [(comb, underlying, sigma, rate, trials, days_to_expiration, long_strike, long_price) for comb in results]
+                )
                 pool.close()
                 pool.join()
 
-                # Create a lock for ensuring safe DataFrame updates
-                lock = threading.Lock()
-
                 # Fill the DataFrame with the calculated POP values
-                for (multiple, closing_days), pop_value in zip(results, pop_values):
+                for (multiple, closing_days, pop_value) in pop_values:
                     multiple_int = int(multiple)
                     closing_days_int = int(closing_days)
-                    # Use the lock to ensure safe DataFrame updates
-                    with lock:
-                        pop_results.at[multiple_int, closing_days_int] = pop_value
+                    pop_results.at[multiple_int, closing_days_int] = pop_value
 
             # Display the calculated POP values in a table with cell background color
             st.write("Calculated POP Values:")
@@ -151,7 +146,7 @@ def main():
             # Create X and Y values for the scatter plot
             x_values = []
             y_values = []
-            for (multiple, closing_days), pop_value in zip(results, pop_values):
+            for (multiple, closing_days, pop_value) in pop_values:
                 x_values.append(multiple)
                 y_values.append(pop_value)
 
@@ -183,10 +178,10 @@ def main():
             st.pyplot(plt)
 
             # Calculate the Entry Credit for the put credit spread
-            entry_credit = (short_price - long_price)*100
-            
+            entry_credit = (short_price - long_price) * 100
+
             # Calculate the Entry Credit for the call credit spread
-            max_risk = ((long_strike - short_strike) + (long_price - short_price))*100
+            max_risk = ((long_strike - short_strike) + (long_price - short_price)) * 100
 
             # Calculate and display the maximum profit
             max_profit = (short_price - long_price) * 100
@@ -198,14 +193,15 @@ def main():
             mean_pop = pop_results.stack().mean()
 
             # Calculate the geometric mean of POP values
-            geometric_mean_pop = pop_results.stack().apply(lambda x: 1 + (x / 100)).prod() ** (1 / len(pop_results.stack())) - 1
+            geometric_mean_pop = pop_results.stack().apply(lambda x: 1 + (x / 100)).prod() ** (
+                        1 / len(pop_results.stack())) - 1
 
             # Calculate breakevens at expiry for call credit spreads
             underlying_breakeven = short_strike + (short_price - long_price)
 
             # Calculate the sum of values in the last available column of pop_results
             probability_of_profit = (pop_results.iloc[:, -1].sum()) / 100
-            
+
             # Display the calculated values
             st.write(f"Entry Credit: ${entry_credit:.2f}")
             st.write(f"Maximum Risk: ${max_risk:.2f}")
@@ -215,7 +211,7 @@ def main():
             st.write(f"Arithmetic-Mean POP: {mean_pop:.2f}%")
             st.write(f"Geometric-Mean POP: {geometric_mean_pop * 100:.2f}%")
             st.write(f"Probability of Profit: {probability_of_profit:.2f}%")
-    
+
     except Exception as e:
         st.error(f"An error occurred: {e}")
 

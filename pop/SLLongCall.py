@@ -124,7 +124,7 @@ def main():
                 results = []
                 for multiple in multiple_array:
                     for closing_days in closing_days_array:
-                        results.append((int(multiple), int(closing_days)))
+                        results.append((int(multiple), int(closing_days))
 
                 # Ensure that the pop_values list contains numeric values
                 pop_values = pool.starmap(calculate_pop, [(p, cd, underlying, sigma, rate, trials, days_to_expiration, long_strike, long_price) for p, cd in results])
@@ -133,6 +133,8 @@ def main():
 
                 # Fill the DataFrame with the calculated POP values
                 for (multiple, closing_days), pop_value in zip(results, pop_values):
+                    multiple_int = int(multiple)
+                    closing_days_int = int(closing_days)
                     pop_results.at[multiple_int, closing_days_int] = pop_value
 
             # Display the calculated POP values in a table with cell background color

@@ -125,7 +125,7 @@ def main():
                 results = []
                 for multiple in multiple_array:
                     for closing_days in closing_days_array:
-                        results.append((int(multiple), int(closing_days)))
+                        results.append((int(multiple), int(closing_days))
 
                 # Create a multiprocessing pool with the number of processes you want to use
                 num_processes = multiprocessing.cpu_count()  # Use all available CPU cores

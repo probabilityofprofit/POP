@@ -133,7 +133,6 @@ def main():
 
                 # Fill the DataFrame with the calculated POP values
                 for (multiple, closing_days), pop_value in zip(results, pop_values):
-                    multiple_int = int(multiple)
                     closing_days_int = int(closing_days)
                     pop_results.at[multiple_int, closing_days_int] = pop_value
 

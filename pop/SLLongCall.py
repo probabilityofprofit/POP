@@ -73,7 +73,7 @@ combined_styles = hide_streamlit_style + custom_css
 st.markdown(combined_styles, unsafe_allow_html=True)
 
 # Function to calculate POP for a specific combination of percentage and closing days
-def calculate_pop(multiple, closing_days, underlying, sigma, rate, trials, days_to_expiration, long_strike, long_price):
+def calculate_pop(multiple_array, closing_days, underlying, sigma, rate, trials, days_to_expiration, long_strike, long_price):
     # Calculate POP and convert the result to a float with two decimal places
     pop_value = float(poptions.longCall(
         underlying, sigma, rate, trials, days_to_expiration,
@@ -99,7 +99,7 @@ def main():
         sigma = st.number_input("Enter the sigma (volatility) as a percentage:", value=0.00, placeholder="e.g. 11.27", min_value=0.00)
         rate = st.number_input("Enter the interest rate as a percentage:", value=0.00, placeholder="e.g. 5.28", min_value=0.00)
         days_to_expiration = st.number_input("Enter the days to expiration:", placeholder="e.g. 9", min_value=0, step=1)
-        multiple_array = np.arange(.01, 1.01, .01)
+        multiple_array = np.arange(0.01, 1.01, 0.01)
         trials = 2000
 
         # Dynamically generate the closing_days_array based on days_to_expiration

@@ -116,6 +116,11 @@ def main():
         y_labels = [str(int(m * 100)) for m in multiple_array]
         pop_results.index = y_labels  # Update the Y column labels
 
+        # Reset the index to make it unique
+        pop_results.reset_index(inplace=True)
+        pop_results.set_index('index', inplace=True)
+        pop_results.index.name = None  # Remove the index name
+        
         # Add a "Calculate" button to trigger the calculation
         if st.button("Calculate"):
             # Use st.spinner to display a loading spinner while calculating

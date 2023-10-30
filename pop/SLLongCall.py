@@ -47,7 +47,7 @@ custom_css = """
     background-color: yellow;
 }
 
-.high-pop {
+high-pop {
     background-color: green;
     color: white; /* Add white text color for visibility on green background */
 }
@@ -88,6 +88,15 @@ def custom_pop_colormap():
     
     # Create the custom colormap
     return LinearSegmentedColormap.from_list('custom_pop_colormap', colors)
+
+# Function to format Y column headers for visual representation
+def format_y_column_headers(column_name):
+    try:
+        column_value = float(column_name)
+        # Multiply by 100 and convert to integer to display as whole numbers
+        return f"{int(column_value * 100):d}"
+    except ValueError:
+        return column_name
 
 # Streamlit UI
 def main():

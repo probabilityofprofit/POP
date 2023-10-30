@@ -137,7 +137,7 @@ def main():
 
             # Display the calculated POP values in a table with cell background color
             st.write("Calculated POP Values:")
-            formatted_pop_results = pop_results.applymap(lambda x: f'{x / 100:.2f}')  # Divide by 100 for display
+            formatted_pop_results = pop_results.applymap(lambda x: f'{x:.2f}')  # Divide by 100 for display
             st.dataframe(formatted_pop_results.style.applymap(color_pop_cells), height=800)
             
             # Create X and Y values for the scatter plot

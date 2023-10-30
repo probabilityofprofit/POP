@@ -133,7 +133,7 @@ def main():
 
                 # Fill the DataFrame with the calculated POP values
                 for (multiple, closing_days), pop_value in zip(results, pop_values):
-                    pop_results.at[multiple * 100, closing_days] = pop_value  # Map Y Index to whole numbers
+                    pop_results.at[int(multiple * 100), closing_days] = pop_value  # Map Y Index to whole numbers
 
             # Display the calculated POP values in a table with cell background color
             st.write("Calculated POP Values:")
@@ -144,7 +144,7 @@ def main():
             x_values = []
             y_values = []
             for (multiple, closing_days), pop_value in zip(results, pop_values):
-                x_values.append(multiple * 100)
+                x_values.append(int(multiple * 100))
                 y_values.append(pop_value)
 
             # Convert y_values to numeric values

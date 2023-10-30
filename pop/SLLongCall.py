@@ -140,7 +140,12 @@ def main():
             formatted_pop_results = pop_results.copy()
             formatted_pop_results.index = [int(m * 100) for m in formatted_pop_results.index]
             formatted_pop_results.index.name = 'Multiple'
+            
+            # Create a custom representation for the Y-column while keeping the decimal values
+            formatted_pop_results.columns = [f'{cd} ({cd / 100:.2f})' for cd in formatted_pop_results.columns]
+            
             st.dataframe(formatted_pop_results.style.applymap(color_pop_cells), height=800)
+
 
             # Create X and Y values for the scatter plot
             x_values = []

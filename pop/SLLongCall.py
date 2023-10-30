@@ -89,11 +89,6 @@ def custom_pop_colormap():
     # Create the custom colormap
     return LinearSegmentedColormap.from_list('custom_pop_colormap', colors)
 
-# Function to transform Y Index column
-def transform_y_index(y_index):
-    # Transform the Y Index from decimals to whole numbers for visualization
-    return int(y_index * 100)
-
 # Streamlit UI
 def main():
     try:
@@ -140,18 +135,11 @@ def main():
                 for (multiple, closing_days), pop_value in zip(results, pop_values):
                     pop_results.at[multiple, closing_days] = pop_value  # No need to convert to int
 
-                # Reset the index for visualization
-                pop_results.reset_index(inplace=True)
-                pop_results['index'] = pop_results['index'].map(transform_y_index)
-
-                # Set the transformed index back as the index
-                pop_results.set_index('index', inplace=True)
-
             # Display the calculated POP values in a table with cell background color
             st.write("Calculated POP Values:")
             formatted_pop_results = pop_results.applymap(lambda x: f'{x:.2f}')
             st.dataframe(formatted_pop_results.style.applymap(color_pop_cells), height=800)
-
+            
             # Create X and Y values for the scatter plot
             x_values = []
             y_values = []

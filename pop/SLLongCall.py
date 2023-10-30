@@ -84,7 +84,7 @@ def calculate_pop(multiple, closing_days, underlying, sigma, rate, trials, days_
 # Define a custom colormap for POP values
 def custom_pop_colormap():
     # Define colors and their corresponding positions (from 0 to 1)
-    colors = [(0.0, 'red'), (0.5, 'yellow'), (1.0, 'green')]
+    colors = [(0.0, 'red'), (0.5, 'yellow'), (1.0, 'green')
     
     # Create the custom colormap
     return LinearSegmentedColormap.from_list('custom_pop_colormap', colors)
@@ -110,17 +110,8 @@ def main():
         long_price = st.number_input("Enter the long price:", value=0.00, placeholder="e.g. 1.01", min_value=0.00)
 
         # Create an empty DataFrame to store results
-        pop_results = pd.DataFrame(index=multiple_array, columns=closing_days_array)
+        pop_results = pd.DataFrame(index=multiple_array, columns=range(1, days_to_expiration + 1))
 
-        # Map Y column labels to whole numbers (1 to 101)
-        y_labels = [str(int(m * 100)) for m in multiple_array]
-        pop_results.index = y_labels  # Update the Y column labels
-
-        # Reset the index to make it unique
-        pop_results.reset_index(inplace=True)
-        pop_results.set_index('index', inplace=True)
-        pop_results.index.name = None  # Remove the index name
-        
         # Add a "Calculate" button to trigger the calculation
         if st.button("Calculate"):
             # Use st.spinner to display a loading spinner while calculating

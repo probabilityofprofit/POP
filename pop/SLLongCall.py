@@ -145,6 +145,7 @@ def main():
             # Scale the Y values for visualization while keeping the decimal values for calculations
             scaled_pop_results = pop_results.copy()
             scaled_pop_results.index = scaled_pop_results.index.map(lambda x: int(x * 100))
+            scaled_pop_results = scaled_pop_results.reset_index()  # Reset the index to make it unique
             st.dataframe(scaled_pop_results.style.applymap(color_pop_cells), height=800)
             
             # Create X and Y values for the scatter plot

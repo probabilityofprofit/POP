@@ -47,7 +47,7 @@ custom_css = """
     background-color: yellow;
 }
 
-high-pop {
+.high-pop {
     background-color: green;
     color: white; /* Add white text color for visibility on green background */
 }
@@ -89,14 +89,9 @@ def custom_pop_colormap():
     # Create the custom colormap
     return LinearSegmentedColormap.from_list('custom_pop_colormap', colors)
 
-# Function to format Y column headers for visual representation
-def format_y_column_headers(column_name):
-    try:
-        column_value = float(column_name)
-        # Multiply by 100 and convert to integer to display as whole numbers
-        return f"{int(column_value * 100):d}"
-    except ValueError:
-        return column_name
+# Function to scale Y values for visualization
+def scale_y_values(y_values):
+    return [int(y * 100) for y in y_values]
 
 # Streamlit UI
 def main():
@@ -146,9 +141,11 @@ def main():
 
             # Display the calculated POP values in a table with cell background color
             st.write("Calculated POP Values:")
-            formatted_pop_results = pop_results.applymap(lambda x: f'{x:.2f}')
-            formatted_pop_results.columns = [format_y_column_headers(col) for col in formatted_pop_results.columns]  # Format Y column headers
-            st.dataframe(formatted_pop_results.style.applymap(color_pop_cells), height=800)
+            
+            # Scale the Y values for visualization while keeping the decimal values for calculations
+            scaled_pop_results = pop_results.copy()
+            scaled_pop_results.index = scaled_pop_results.index.map(lambda x: int(x * 100))
+            st.dataframe(scaled_pop_results.style.applymap(color_pop_cells), height=800)
             
             # Create X and Y values for the scatter plot
             x_values = []

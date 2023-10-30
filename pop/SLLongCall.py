@@ -144,7 +144,7 @@ def main():
             x_values = []
             y_values = []
             for (multiple, closing_days), pop_value in zip(results, pop_values):
-                x_values.append(multiple)
+                x_values.append(multiple * 100)
                 y_values.append(pop_value)
 
             # Convert y_values to numeric values

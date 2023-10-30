@@ -84,7 +84,7 @@ def calculate_pop(multiple, closing_days, underlying, sigma, rate, trials, days_
 # Define a custom colormap for POP values
 def custom_pop_colormap():
     # Define colors and their corresponding positions (from 0 to 1)
-    colors = [(0.0, 'red'), (0.5, 'yellow'), (1.0, 'green')]
+    colors = [(0.0, 'red'), (0.5, 'yellow'), (1.0, 'green')
     
     # Create the custom colormap
     return LinearSegmentedColormap.from_list('custom_pop_colormap', colors)
@@ -110,7 +110,7 @@ def main():
         long_price = st.number_input("Enter the long price:", value=0.00, placeholder="e.g. 1.01", min_value=0.00)
 
         # Create an empty DataFrame to store results
-        pop_results = pd.DataFrame(index=multiple_array, columns=closing_days_array)
+        pop_results = pd.DataFrame(index=multiple_array * 100, columns=closing_days_array)  # Multiply by 100 here
 
         # Add a "Calculate" button to trigger the calculation
         if st.button("Calculate"):
@@ -133,11 +133,11 @@ def main():
 
                 # Fill the DataFrame with the calculated POP values
                 for (multiple, closing_days), pop_value in zip(results, pop_values):
-                    pop_results.at[multiple, closing_days] = pop_value  # No need to convert to int
+                    pop_results.at[multiple * 100, closing_days] = pop_value  # Multiply by 100 here
 
             # Display the calculated POP values in a table with cell background color
             st.write("Calculated POP Values:")
-            formatted_pop_results = pop_results.applymap(lambda x: f'{x:.2f}')
+            formatted_pop_results = pop_results.applymap(lambda x: f'{x / 100:.2f}')  # Divide by 100 for display
             st.dataframe(formatted_pop_results.style.applymap(color_pop_cells), height=800)
             
             # Create X and Y values for the scatter plot

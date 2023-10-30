@@ -89,10 +89,6 @@ def custom_pop_colormap():
     # Create the custom colormap
     return LinearSegmentedColormap.from_list('custom_pop_colormap', colors)
 
-# Function to scale Y values for visualization
-def scale_y_values(y_values):
-    return [int(y * 100) for y in y_values]
-
 # Streamlit UI
 def main():
     try:
@@ -137,16 +133,12 @@ def main():
 
                 # Fill the DataFrame with the calculated POP values
                 for (multiple, closing_days), pop_value in zip(results, pop_values):
-                    pop_results.at[multiple, closing_days] = pop_value  # No need to convert to int
+                    pop_results.at[multiple * 100, closing_days] = pop_value  # Map Y Index to whole numbers
 
             # Display the calculated POP values in a table with cell background color
             st.write("Calculated POP Values:")
-            
-            # Scale the Y values for visualization while keeping the decimal values for calculations
-            scaled_pop_results = pop_results.copy()
-            scaled_pop_results.index = scaled_pop_results.index.map(lambda x: int(x * 100))
-            scaled_pop_results = scaled_pop_results.reset_index()  # Reset the index to make it unique
-            st.dataframe(scaled_pop_results.style.applymap(color_pop_cells), height=800)
+            formatted_pop_results = pop_results.applymap(lambda x: f'{x:.2f}')
+            st.dataframe(formatted_pop_results.style.applymap(color_pop_cells), height=800)
             
             # Create X and Y values for the scatter plot
             x_values = []

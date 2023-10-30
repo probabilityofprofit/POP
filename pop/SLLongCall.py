@@ -137,7 +137,9 @@ def main():
 
             # Display the calculated POP values in a table with cell background color
             st.write("Calculated POP Values:")
-            formatted_pop_results = pop_results.applymap(lambda x: f'{x:.2f}')
+            formatted_pop_results = pop_results.copy()
+            formatted_pop_results.index = [int(m * 100) for m in formatted_pop_results.index]
+            formatted_pop_results.index.name = 'Multiple'
             st.dataframe(formatted_pop_results.style.applymap(color_pop_cells), height=800)
 
             # Create X and Y values for the scatter plot

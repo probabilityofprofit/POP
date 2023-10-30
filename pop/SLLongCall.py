@@ -133,18 +133,27 @@ def main():
 
                 # Fill the DataFrame with the calculated POP values
                 for (multiple, closing_days), pop_value in zip(results, pop_values):
-                    pop_results.at[int(multiple * 100), closing_days] = pop_value  # Map Y Index to whole numbers
+                    pop_results.at[multiple, closing_days] = pop_value  # No need to convert to int
 
             # Display the calculated POP values in a table with cell background color
             st.write("Calculated POP Values:")
             formatted_pop_results = pop_results.applymap(lambda x: f'{x:.2f}')
-            st.dataframe(formatted_pop_results.style.applymap(color_pop_cells), height=800)
             
+            # Transform Y Index values for visualization
+            def transform_y_index(y_index):
+                # Transform the Y Index from decimals to whole numbers for visualization
+                return int(y_index * 100)
+            
+            # Apply the transformation to the Y Index column
+            formatted_pop_results['Y Index'] = formatted_pop_results.index.map(transform_y_index)
+
+            st.dataframe(formatted_pop_results[['Y Index'] + list(closing_days_array)].style.applymap(color_pop_cells), height=800)
+
             # Create X and Y values for the scatter plot
             x_values = []
             y_values = []
             for (multiple, closing_days), pop_value in zip(results, pop_values):
-                x_values.append(int(multiple * 100))
+                x_values.append(multiple * 100)
                 y_values.append(pop_value)
 
             # Convert y_values to numeric values

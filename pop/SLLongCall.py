@@ -112,6 +112,10 @@ def main():
         # Create an empty DataFrame to store results
         pop_results = pd.DataFrame(index=multiple_array, columns=closing_days_array)
 
+        # Map Y column labels to whole numbers (1 to 101)
+        y_labels = [str(int(m * 100)) for m in multiple_array]
+        pop_results.index = y_labels  # Update the Y column labels
+
         # Add a "Calculate" button to trigger the calculation
         if st.button("Calculate"):
             # Use st.spinner to display a loading spinner while calculating

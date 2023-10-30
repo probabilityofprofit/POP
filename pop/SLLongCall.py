@@ -145,9 +145,9 @@ def main():
                 return int(y_index * 100)
             
             # Apply the transformation to the Y Index column
-            formatted_pop_results['Y Index'] = formatted_pop_results.index.map(transform_y_index)
+            formatted_pop_results.index = formatted_pop_results.index.map(transform_y_index)
 
-            st.dataframe(formatted_pop_results[['Y Index'] + list(closing_days_array)].style.applymap(color_pop_cells), height=800)
+            st.dataframe(formatted_pop_results.style.applymap(color_pop_cells), height=800)
 
             # Create X and Y values for the scatter plot
             x_values = []

@@ -181,7 +181,7 @@ def main():
             max_risk = long_price * 100
 
             # Calculate and display the maximum profit
-            max_profit = long_price
+            max_profit = ((long_strike - 0) * 100) - long_price))
 
             # Calculate the maximum return on risk for call credit spreads
             max_return_on_risk = max_profit / max_risk
@@ -193,7 +193,7 @@ def main():
             geometric_mean_pop = pop_results.stack().apply(lambda x: 1 + (x / 100)).prod() ** (1 / len(pop_results.stack())) - 1
 
             # Calculate breakevens at expiry for call credit spreads
-            underlying_breakeven = long_strike + long_price
+            underlying_breakeven = long_strike - long_price
 
             # Calculate the sum of values in the last available column of pop_results
             probability_of_profit = (pop_results.iloc[:, -1].sum()) / 100

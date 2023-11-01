@@ -201,8 +201,8 @@ def main():
             # Display the calculated values
             st.write(f"Entry Cost: ${entry_cost:.2f}")
             st.write(f"Maximum Risk: ${max_risk:.2f}")
-            st.write(f"Maximum Return: Infinite")
-            st.write(f"Maximum Return on Risk: Infinite")
+            st.write(f"Maximum Return: ${max_proft:.2f}")
+            st.write(f"Maximum Return on Risk: ${max_return_on_risk:.2f}")
             st.write(f"Underlying Breakeven at Expiry: ${underlying_breakeven:.2f}")
             st.write(f"Arithmetic-Mean POP: {mean_pop:.2f}%")
             st.write(f"Geometric-Mean POP: {geometric_mean_pop * 100:.2f}%")

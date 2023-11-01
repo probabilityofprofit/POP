@@ -181,7 +181,7 @@ def main():
             max_risk = long_price * 100
 
             # Calculate and display the maximum profit
-            max_profit = ((long_strike - 0) * 100) - long_price))
+            max_profit = ((long_strike - 0) * 100) - long_price
 
             # Calculate the maximum return on risk for call credit spreads
             max_return_on_risk = max_profit / max_risk

@@ -177,16 +177,16 @@ def main():
             plt.tight_layout()
             st.pyplot(plt)
 
-            # Calculate the Entry Credit for the put credit spread
+            # Calculate the Entry Credit for the Short Call
             entry_credit = short_price * 100
             
-            # Calculate the Entry Credit for the call credit spread
+            # Calculate the Maximum Risk for the Short Call
             max_risk = short_price
 
             # Calculate and display the maximum profit
             max_profit = short_price * 100
 
-            # Calculate the maximum return on risk for call credit spreads
+            # Calculate the maximum return on risk for the Short Call
             max_return_on_risk = max_profit / max_risk
 
             # Calculate the mean of POP values
@@ -195,7 +195,7 @@ def main():
             # Calculate the geometric mean of POP values
             geometric_mean_pop = pop_results.stack().apply(lambda x: 1 + (x / 100)).prod() ** (1 / len(pop_results.stack())) - 1
 
-            # Calculate breakevens at expiry for call credit spreads
+            # Calculate breakevens at expiry for the Short Call
             underlying_breakeven = short_strike + short_price
 
             # Calculate the sum of values in the last available column of pop_results

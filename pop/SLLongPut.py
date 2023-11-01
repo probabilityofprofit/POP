@@ -73,12 +73,11 @@ combined_styles = hide_streamlit_style + custom_css
 st.markdown(combined_styles, unsafe_allow_html=True)
 
 # Function to calculate POP for a specific combination of percentage and closing days
-def calculate_pop(percentage, closing_days, underlying, sigma, rate, trials, days_to_expiration, short_strike, short_price, long_strike, long_price):
+def calculate_pop(multiple, closing_days, underlying, sigma, rate, trials, days_to_expiration, long_strike, long_price):
     # Calculate POP and convert the result to a float with two decimal places
-    pop_value = float(poptions.callCreditSpread(
+    pop_value = float(poptions.longPut(
         underlying, sigma, rate, trials, days_to_expiration,
-        [closing_days], [percentage], short_strike,
-        short_price, long_strike, long_price
+        [closing_days], [multiple], long_strike, long_price
     ))
     return pop_value
 
@@ -93,27 +92,25 @@ def custom_pop_colormap():
 # Streamlit UI
 def main():
     try:
-        st.title("Call Credit Spread")
+        st.title("Long Put")
 
         # Manual input of values
         underlying = st.number_input("Enter the underlying price:", value=0.00, placeholder="e.g. 347.47", min_value=0.00)
         sigma = st.number_input("Enter the sigma (volatility) as a percentage:", value=0.00, placeholder="e.g. 11.27", min_value=0.00)
         rate = st.number_input("Enter the interest rate as a percentage:", value=0.00, placeholder="e.g. 5.28", min_value=0.00)
         days_to_expiration = st.number_input("Enter the days to expiration:", placeholder="e.g. 9", min_value=0, step=1)
-        percentage_array = np.arange(1, 101)
+        multiple_array = np.arange(0.01, 1.01, 0.01)
         trials = 2000
 
         # Dynamically generate the closing_days_array based on days_to_expiration
         closing_days_array = np.arange(1, days_to_expiration + 1)
 
         # Define the missing variables for manual input
-        short_strike = st.number_input("Enter the short strike:", value=0.00, placeholder="e.g. 350", min_value=0.00)
-        short_price = st.number_input("Enter the short price:", value=0.00, placeholder="e.g. 2.46", min_value=0.00)
         long_strike = st.number_input("Enter the long strike:", value=0.00, placeholder="e.g. 347.50", min_value=0.00)
         long_price = st.number_input("Enter the long price:", value=0.00, placeholder="e.g. 1.01", min_value=0.00)
 
         # Create an empty DataFrame to store results
-        pop_results = pd.DataFrame(index=percentage_array, columns=closing_days_array)
+        pop_results = pd.DataFrame(index=multiple_array * 100, columns=closing_days_array)  # Multiply by 100 here
 
         # Add a "Calculate" button to trigger the calculation
         if st.button("Calculate"):
@@ -125,31 +122,29 @@ def main():
 
                 # Calculate POP values using multiprocessing
                 results = []
-                for percentage in percentage_array:
+                for multiple in multiple_array:
                     for closing_days in closing_days_array:
-                        results.append((int(percentage), int(closing_days)))
+                        results.append((multiple, closing_days))  # Use decimal values here
 
                 # Ensure that the pop_values list contains numeric values
-                pop_values = pool.starmap(calculate_pop, [(p, cd, underlying, sigma, rate, trials, days_to_expiration, short_strike, short_price, long_strike, long_price) for p, cd in results])
+                pop_values = pool.starmap(calculate_pop, [(p, cd, underlying, sigma, rate, trials, days_to_expiration, long_strike, long_price) for p, cd in results])
                 pool.close()
                 pool.join()
 
                 # Fill the DataFrame with the calculated POP values
-                for (percentage, closing_days), pop_value in zip(results, pop_values):
-                    percentage_int = int(percentage)
-                    closing_days_int = int(closing_days)
-                    pop_results.at[percentage_int, closing_days_int] = pop_value
+                for (multiple, closing_days), pop_value in zip(results, pop_values):
+                    pop_results.at[multiple * 100, closing_days] = pop_value  # Multiply by 100 here
 
             # Display the calculated POP values in a table with cell background color
             st.write("Calculated POP Values:")
-            formatted_pop_results = pop_results.applymap(lambda x: f'{x:.2f}')
+            formatted_pop_results = pop_results.applymap(lambda x: f'{x:.2f}')  # Divide by 100 for display
             st.dataframe(formatted_pop_results.style.applymap(color_pop_cells), height=800)
-
+            
             # Create X and Y values for the scatter plot
             x_values = []
             y_values = []
-            for (percentage, closing_days), pop_value in zip(results, pop_values):
-                x_values.append(percentage)
+            for (multiple, closing_days), pop_value in zip(results, pop_values):
+                x_values.append(multiple * 100)
                 y_values.append(pop_value)
 
             # Convert y_values to numeric values
@@ -180,13 +175,13 @@ def main():
             st.pyplot(plt)
 
             # Calculate the Entry Credit for the put credit spread
-            entry_credit = (short_price - long_price)*100
+            entry_cost = long_price * 100
             
             # Calculate the Entry Credit for the call credit spread
-            max_risk = ((long_strike - short_strike) + (long_price - short_price))*100
+            max_risk = long_price * 100
 
             # Calculate and display the maximum profit
-            max_profit = (short_price - long_price) * 100
+            max_profit = long_price
 
             # Calculate the maximum return on risk for call credit spreads
             max_return_on_risk = max_profit / max_risk
@@ -198,16 +193,16 @@ def main():
             geometric_mean_pop = pop_results.stack().apply(lambda x: 1 + (x / 100)).prod() ** (1 / len(pop_results.stack())) - 1
 
             # Calculate breakevens at expiry for call credit spreads
-            underlying_breakeven = short_strike + (short_price - long_price)
+            underlying_breakeven = long_strike + long_price
 
             # Calculate the sum of values in the last available column of pop_results
             probability_of_profit = (pop_results.iloc[:, -1].sum()) / 100
             
             # Display the calculated values
-            st.write(f"Entry Credit: ${entry_credit:.2f}")
+            st.write(f"Entry Cost: ${entry_cost:.2f}")
             st.write(f"Maximum Risk: ${max_risk:.2f}")
-            st.write(f"Maximum Return: ${max_profit:.2f}")
-            st.write(f"Maximum Return on Risk: {max_return_on_risk * 100:.2f}%")
+            st.write(f"Maximum Return: Infinite")
+            st.write(f"Maximum Return on Risk: Infinite")
             st.write(f"Underlying Breakeven at Expiry: ${underlying_breakeven:.2f}")
             st.write(f"Arithmetic-Mean POP: {mean_pop:.2f}%")
             st.write(f"Geometric-Mean POP: {geometric_mean_pop * 100:.2f}%")

@@ -93,7 +93,7 @@ def custom_pop_colormap():
 # Streamlit UI
 def main():
     try:
-        st.title("Short Stangle")
+        st.title("Short Strangle")
 
         # Manual input of values
         underlying = st.number_input("Enter the underlying price:", value=0.00, placeholder="e.g. 347.47", min_value=0.00)

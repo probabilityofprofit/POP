@@ -180,7 +180,7 @@ def main():
             st.pyplot(plt)
 
             # Calculate the Entry Credit for the put credit spread
-            entry_credit = call_short_price + put_short_price)*100
+            entry_credit = (call_short_price + put_short_price)*100
             
             # Calculate the Entry Credit for the call credit spread
             max_risk = ((long_strike - short_strike) + (long_price - short_price))*100

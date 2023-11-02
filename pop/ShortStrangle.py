@@ -49,11 +49,6 @@ def shortStrangle(underlying, sigma, rate, trials, days_to_expiration,
     except RuntimeError as err:
         print(err.args)
 
-    response = {
-        "pop": pop,
-        "pop_error": pop_error,
-        "avg_dtc": avg_dtc,
-        "avg_dtc_error": avg_dtc_error
-    }
+    response = "   ".join(f"{value:.2f}" for value in pop)
 
     return response

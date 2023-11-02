@@ -180,13 +180,13 @@ def main():
             st.pyplot(plt)
 
             # Calculate the Entry Credit for the put credit spread
-            entry_credit = (short_price - long_price)*100
+            entry_credit = call_short_price + put_short_price)*100
             
             # Calculate the Entry Credit for the call credit spread
             max_risk = ((long_strike - short_strike) + (long_price - short_price))*100
 
             # Calculate and display the maximum profit
-            max_profit = (short_price - long_price) * 100
+            max_profit = entry_credit
 
             # Calculate the maximum return on risk for call credit spreads
             max_return_on_risk = max_profit / max_risk
@@ -198,17 +198,21 @@ def main():
             geometric_mean_pop = pop_results.stack().apply(lambda x: 1 + (x / 100)).prod() ** (1 / len(pop_results.stack())) - 1
 
             # Calculate breakevens at expiry for call credit spreads
-            underlying_breakeven = short_strike + (short_price - long_price)
+            upper_underlying_breakeven = call_short_strike + entry_credit
 
+            # Calculate breakevens at expiry for call credit spreads
+            lower_underlying_breakeven = put_short_strike + entry_credit
+            
             # Calculate the sum of values in the last available column of pop_results
             probability_of_profit = (pop_results.iloc[:, -1].sum()) / 100
             
             # Display the calculated values
             st.write(f"Entry Credit: ${entry_credit:.2f}")
-            st.write(f"Maximum Risk: ${max_risk:.2f}")
+            st.write(f"Maximum Risk: Infinite")
             st.write(f"Maximum Return: ${max_profit:.2f}")
-            st.write(f"Maximum Return on Risk: {max_return_on_risk * 100:.2f}%")
-            st.write(f"Underlying Breakeven at Expiry: ${underlying_breakeven:.2f}")
+            st.write(f"Maximum Return on Risk: N/A")
+            st.write(f"Upper Underlying Breakeven at Expiry: ${upper_underlying_breakeven:.2f}")
+            st.write(f"Lower Underlying Breakeven at Expiry: ${lower_underlying_breakeven:.2f}")
             st.write(f"Arithmetic-Mean POP: {mean_pop:.2f}%")
             st.write(f"Geometric-Mean POP: {geometric_mean_pop * 100:.2f}%")
             st.write(f"Probability of Profit: {probability_of_profit:.2f}%")

@@ -203,7 +203,7 @@ def main():
             
             # Display the calculated values
             st.write(f"Entry Credit: ${entry_credit:.2f}")
-            st.write(f"Maximum Risk: ${max_risk:.2f}")
+            st.write(f"Maximum Risk: ${max_risk:,.2f}")
             st.write(f"Maximum Return: ${max_profit:.2f}")
             st.write(f"Maximum Return on Risk: {max_return_on_risk * 100:.2f}%")
             st.write(f"Underlying Breakeven at Expiry: ${underlying_breakeven:.2f}")

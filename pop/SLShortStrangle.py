@@ -73,7 +73,7 @@ combined_styles = hide_streamlit_style + custom_css
 st.markdown(combined_styles, unsafe_allow_html=True)
 
 # Function to calculate POP for a specific combination of percentage and closing days
-def calculate_pop(percentage, closing_days, underlying, sigma, rate, trials, days_to_expiration, short_strike, short_price, long_strike, long_price):
+def calculate_pop(percentage, closing_days, underlying, sigma, rate, trials, days_to_expiration, call_short_strike, call_short_price, put_short_strike, put_short_price):
     # Calculate POP and convert the result to a float with two decimal places
     pop_value = float(poptions.shortStrangle(
         underlying, sigma, rate, trials, days_to_expiration,

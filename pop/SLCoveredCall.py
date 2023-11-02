@@ -178,13 +178,13 @@ def main():
             st.pyplot(plt)
 
             # Calculate the Entry Credit for the put credit spread
-            entry_credit = (short_price - long_price)*100
+            entry_credit = short_price * 100
             
             # Calculate the Entry Credit for the call credit spread
-            max_risk = ((long_strike - short_strike) + (long_price - short_price))*100
+            max_risk = ((underlying * 100) - entry_credit)
 
             # Calculate and display the maximum profit
-            max_profit = (short_price - long_price) * 100
+            max_profit = ((entry_credit - (underlying - short_strike) * 100))
 
             # Calculate the maximum return on risk for call credit spreads
             max_return_on_risk = max_profit / max_risk
@@ -196,7 +196,7 @@ def main():
             geometric_mean_pop = pop_results.stack().apply(lambda x: 1 + (x / 100)).prod() ** (1 / len(pop_results.stack())) - 1
 
             # Calculate breakevens at expiry for call credit spreads
-            underlying_breakeven = short_strike + (short_price - long_price)
+            underlying_breakeven = ((underlying * 100) - entry_credit) / 100
 
             # Calculate the sum of values in the last available column of pop_results
             probability_of_profit = (pop_results.iloc[:, -1].sum()) / 100

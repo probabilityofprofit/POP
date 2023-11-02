@@ -198,10 +198,10 @@ def main():
             geometric_mean_pop = pop_results.stack().apply(lambda x: 1 + (x / 100)).prod() ** (1 / len(pop_results.stack())) - 1
 
             # Calculate breakevens at expiry for call credit spreads
-            upper_underlying_breakeven = call_short_strike + entry_credit
+            upper_underlying_breakeven = call_short_strike + entry_credit/100
 
             # Calculate breakevens at expiry for call credit spreads
-            lower_underlying_breakeven = put_short_strike + entry_credit
+            lower_underlying_breakeven = put_short_strike + entry_credit/100
             
             # Calculate the sum of values in the last available column of pop_results
             probability_of_profit = (pop_results.iloc[:, -1].sum()) / 100

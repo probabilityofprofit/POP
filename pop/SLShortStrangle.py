@@ -183,7 +183,7 @@ def main():
             entry_credit = (call_short_price + put_short_price)*100
             
             # Calculate the Entry Credit for the call credit spread
-            max_risk = ((long_strike - short_strike) + (long_price - short_price))*100
+            max_risk = ((call_short_strike - put_short_strike) + (put_short_price - call_short_price))*100
 
             # Calculate and display the maximum profit
             max_profit = entry_credit

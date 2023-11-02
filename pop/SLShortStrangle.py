@@ -201,7 +201,7 @@ def main():
             upper_underlying_breakeven = call_short_strike + entry_credit/100
 
             # Calculate breakevens at expiry for call credit spreads
-            lower_underlying_breakeven = put_short_strike + entry_credit/100
+            lower_underlying_breakeven = put_short_strike - entry_credit/100
             
             # Calculate the sum of values in the last available column of pop_results
             probability_of_profit = (pop_results.iloc[:, -1].sum()) / 100

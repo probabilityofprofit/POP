@@ -73,12 +73,14 @@ combined_styles = hide_streamlit_style + custom_css
 st.markdown(combined_styles, unsafe_allow_html=True)
 
 # Function to calculate POP for a specific combination of percentage and closing days
-def calculate_pop(percentage, closing_days, underlying, sigma, rate, trials, days_to_expiration, short_strike, short_price, long_strike, long_price):
+def calculate_pop(percentage, closing_days, underlying, sigma, rate, trials, days_to_expiration, put_short_strike, put_short_price, put_long_strike, put_long_price, call_short_strike, call_short_price, call_long_strike, call_long_price):
     # Calculate POP and convert the result to a float with two decimal places
-    pop_value = float(poptions.callCreditSpread(
+    pop_value = float(poptions.ironCondor(
         underlying, sigma, rate, trials, days_to_expiration,
-        [closing_days], [percentage], short_strike,
-        short_price, long_strike, long_price
+        [closing_days], [percentage], put_short_strike,
+        put_short_price, put_long_strike, put_long_price,
+        call_short_strike, call_short_price, call_long_strike,
+        call_long_price
     ))
     return pop_value
 
@@ -93,7 +95,7 @@ def custom_pop_colormap():
 # Streamlit UI
 def main():
     try:
-        st.title("Call Credit Spread")
+        st.title("Iron Condor")
 
         # Manual input of values
         underlying = st.number_input("Enter the underlying price:", value=0.00, placeholder="e.g. 347.47", min_value=0.00)
@@ -107,11 +109,15 @@ def main():
         closing_days_array = np.arange(1, days_to_expiration + 1)
 
         # Define the missing variables for manual input
-        short_strike = st.number_input("Enter the short strike:", value=0.00, placeholder="e.g. 350", min_value=0.00)
-        short_price = st.number_input("Enter the short price:", value=0.00, placeholder="e.g. 2.46", min_value=0.00)
-        long_strike = st.number_input("Enter the long strike:", value=0.00, placeholder="e.g. 347.50", min_value=0.00)
-        long_price = st.number_input("Enter the long price:", value=0.00, placeholder="e.g. 1.01", min_value=0.00)
-
+        put_short_strike = st.number_input("Enter the put short strike:", value=0.00, placeholder="e.g. 350", min_value=0.00)
+        put_short_price = st.number_input("Enter the put short price:", value=0.00, placeholder="e.g. 2.46", min_value=0.00)
+        put_long_strike = st.number_input("Enter the put long strike:", value=0.00, placeholder="e.g. 347.50", min_value=0.00)
+        put_long_price = st.number_input("Enter the put long price:", value=0.00, placeholder="e.g. 1.01", min_value=0.00)
+        call_short_strike = st.number_input("Enter the call short strike:", value=0.00, placeholder="e.g. 350", min_value=0.00)
+        call_short_price = st.number_input("Enter the call short price:", value=0.00, placeholder="e.g. 2.46", min_value=0.00)
+        call_long_strike = st.number_input("Enter the call long strike:", value=0.00, placeholder="e.g. 347.50", min_value=0.00)
+        call_long_price = st.number_input("Enter the call long price:", value=0.00, placeholder="e.g. 1.01", min_value=0.00)
+        
         # Create an empty DataFrame to store results
         pop_results = pd.DataFrame(index=percentage_array, columns=closing_days_array)
 
@@ -130,7 +136,7 @@ def main():
                         results.append((int(percentage), int(closing_days)))
 
                 # Ensure that the pop_values list contains numeric values
-                pop_values = pool.starmap(calculate_pop, [(p, cd, underlying, sigma, rate, trials, days_to_expiration, short_strike, short_price, long_strike, long_price) for p, cd in results])
+                pop_values = pool.starmap(calculate_pop, [(p, cd, underlying, sigma, rate, trials, days_to_expiration, put_short_strike, put_short_price, put_long_strike, put_long_price, call_short_strike, call_short_price, call_long_strike, call_long_price) for p, cd in results])
                 pool.close()
                 pool.join()
 

@@ -107,10 +107,10 @@ def main():
         closing_days_array = np.arange(1, days_to_expiration + 1)
 
         # Define the missing variables for manual input
-        call_short_strike = st.number_input("Enter the short strike:", value=0.00, placeholder="e.g. 350", min_value=0.00)
-        call_short_price = st.number_input("Enter the short price:", value=0.00, placeholder="e.g. 2.46", min_value=0.00)
-        put_short_strike = st.number_input("Enter the long strike:", value=0.00, placeholder="e.g. 347.50", min_value=0.00)
-        put_short_price = st.number_input("Enter the long price:", value=0.00, placeholder="e.g. 1.01", min_value=0.00)
+        call_short_strike = st.number_input("Enter the call short strike:", value=0.00, placeholder="e.g. 350", min_value=0.00)
+        call_short_price = st.number_input("Enter the call short price:", value=0.00, placeholder="e.g. 2.46", min_value=0.00)
+        put_short_strike = st.number_input("Enter the put short strike:", value=0.00, placeholder="e.g. 347.50", min_value=0.00)
+        put_short_price = st.number_input("Enter the put short price:", value=0.00, placeholder="e.g. 1.01", min_value=0.00)
 
         # Create an empty DataFrame to store results
         pop_results = pd.DataFrame(index=percentage_array, columns=closing_days_array)

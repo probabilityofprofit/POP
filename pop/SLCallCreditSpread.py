@@ -107,7 +107,7 @@ def main():
         closing_days_array = np.arange(1, days_to_expiration + 1)
 
         # Define the missing variables for manual input
-        short_strike = st.number_input("Enter the short strike:", value=0.00, placeholder="e.g. 350", min_value=0.00)
+        short_strike = st.number_input("Enter the short strike:", value=0.00, placeholder="e.g. 345", min_value=0.00)
         short_price = st.number_input("Enter the short price:", value=0.00, placeholder="e.g. 2.46", min_value=0.00)
         long_strike = st.number_input("Enter the long strike:", value=0.00, placeholder="e.g. 347.50", min_value=0.00)
         long_price = st.number_input("Enter the long price:", value=0.00, placeholder="e.g. 1.01", min_value=0.00)

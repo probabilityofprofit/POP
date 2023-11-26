@@ -107,7 +107,7 @@ def main():
 
         # Define the missing variables for manual input
         long_strike = st.number_input("Enter the long strike:", value=0.00, placeholder="e.g. 347.50", min_value=0.00)
-        long_price = st.number_input("Enter the long price:", value=0.00, placeholder="e.g. 1.01", min_value=0.00)
+        long_price = st.number_input("Enter the long price:", value=0.00, placeholder="e.g. 2.46", min_value=0.00)
 
         # Create an empty DataFrame to store results
         pop_results = pd.DataFrame(index=multiple_array * 100, columns=closing_days_array)  # Multiply by 100 here
